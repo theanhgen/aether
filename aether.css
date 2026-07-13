@@ -1,0 +1,142 @@
+/* AETHER — shared styles (shadcn oklch theme: neutral + orange primary, green charts) */
+:root{
+  --background:oklch(1 0 0);
+  --foreground:oklch(0.148 0.004 228.8);
+  --card:oklch(1 0 0);
+  --card-foreground:oklch(0.148 0.004 228.8);
+  --primary:oklch(0.553 0.195 38.402);
+  --primary-foreground:oklch(0.98 0.016 73.684);
+  --muted:oklch(0.963 0.002 197.1);
+  --muted-foreground:oklch(0.56 0.021 213.5);
+  --border:oklch(0.925 0.005 214.3);
+  --chart-2:oklch(0.723 0.219 149.579);
+  --radius:0.875rem;
+  --shadow:0 1px 2px oklch(0.148 0.004 228.8 / .04), 0 3px 8px oklch(0.148 0.004 228.8 / .04);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --background:oklch(0.148 0.004 228.8);
+    --foreground:oklch(0.987 0.002 197.1);
+    --card:oklch(0.218 0.008 223.9);
+    --card-foreground:oklch(0.987 0.002 197.1);
+    --primary:oklch(0.47 0.157 37.304);
+    --primary-foreground:oklch(0.98 0.016 73.684);
+    --muted:oklch(0.275 0.011 216.9);
+    --muted-foreground:oklch(0.723 0.014 214.4);
+    --border:oklch(1 0 0 / 10%);
+    --chart-2:oklch(0.723 0.219 149.579);
+    --shadow:0 1px 2px 0 oklch(0 0 0 / .30);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  font:13.5px/1.5 ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  background:var(--background); color:var(--foreground);
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; padding:32px 16px 72px;
+}
+.wrap{max-width:760px; margin:0 auto}
+.tnum{font-variant-numeric:tabular-nums; font-feature-settings:"tnum"}
+
+/* focus layout — main page: one composed unit, vertically centered */
+body.focus{display:flex; min-height:100dvh; align-items:center; justify-content:center; padding:24px 16px}
+body.focus .wrap{max-width:440px; width:100%}
+
+/* staggered enter */
+@keyframes rise{from{opacity:0; transform:translateY(9px)} to{opacity:1; transform:none}}
+.wrap>*{animation:rise .55s cubic-bezier(.2,0,0,1) both}
+.wrap>*:nth-child(1){animation-delay:20ms}
+.wrap>*:nth-child(2){animation-delay:100ms}
+.wrap>*:nth-child(3){animation-delay:180ms}
+.wrap>*:nth-child(4){animation-delay:260ms}
+.wrap>*:nth-child(5){animation-delay:340ms}
+.wrap>*:nth-child(6){animation-delay:420ms}
+@media (prefers-reduced-motion:reduce){ .wrap>*{animation:none} }
+
+header{display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:24px}
+.brand{display:flex; align-items:center; text-decoration:none; color:inherit}
+.dot{width:8px; height:8px; border-radius:50%; background:var(--chart-2); box-shadow:0 0 0 3px color-mix(in oklab, var(--chart-2) 20%, transparent)}
+.brand h1{display:inline-flex; align-items:center; gap:8px; font-size:14px; font-weight:600; letter-spacing:.14em; margin:0}
+.brand .sub{font-size:12px; color:var(--muted-foreground); letter-spacing:.08em}
+.updated{font-size:12px; color:var(--muted-foreground); font-variant-numeric:tabular-nums}
+
+.card{
+  background:var(--card); color:var(--card-foreground);
+  border:1px solid var(--border); border-radius:var(--radius);
+  box-shadow:var(--shadow);
+}
+
+.hero{padding:26px 28px 22px}
+.hero-top{display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px}
+.hero .label{font-size:12px; color:var(--muted-foreground); letter-spacing:.06em; text-transform:lowercase}
+.hero .now{font-size:52px; font-weight:660; letter-spacing:-.03em; line-height:1}
+.hero .now .cur{font-size:19px; color:var(--muted-foreground); font-weight:500; letter-spacing:0; margin-left:9px}
+.hero .accrued{margin-top:9px; font-size:12.5px; color:var(--chart-2); font-variant-numeric:tabular-nums; letter-spacing:.02em}
+.hero .vitals{margin:20px 0 0; padding-top:6px; display:flex; flex-direction:column; gap:0}
+.hero .vitals>div{display:flex; align-items:baseline; justify-content:space-between; gap:16px; padding:9px 0; border-top:1px solid var(--border)}
+.hero .vitals dt{margin:0; font-size:12.5px; color:var(--muted-foreground); letter-spacing:.02em}
+.hero .vitals dd{margin:0; font-size:13.5px; color:var(--foreground)}
+.hero .vitals dd b{font-weight:600}
+
+.navlink{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--muted-foreground); text-decoration:none; letter-spacing:.02em; padding:9px 6px; margin:2px -6px 0; transition-property:color, scale; transition-duration:.14s; transition-timing-function:ease}
+.navlink:hover{color:var(--primary)}
+.navlink:active{scale:.96}
+
+.kpis{display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:28px}
+.kpi{padding:14px 16px}
+.kpi .k{font-size:12px; color:var(--muted-foreground); letter-spacing:.04em}
+.kpi .v{font-size:18px; font-weight:640; margin-top:4px; letter-spacing:-.01em}
+@media (max-width:560px){ .kpis{grid-template-columns:1fr} }
+
+h2{font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--muted-foreground); margin:0 0 12px}
+.log{overflow:hidden}
+.row{display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 18px; border-bottom:1px solid var(--border)}
+.row:last-child{border-bottom:0}
+.row .name{font-size:15px; font-weight:600; letter-spacing:.01em}
+.row .dates{font-size:12px; color:var(--muted-foreground); margin-top:2px}
+.row .amt{font-size:15px; font-weight:600}
+.row .amt.in{color:var(--chart-2)}
+.row .amt.out{color:var(--foreground)}
+a.row.rowlink{text-decoration:none; color:inherit; cursor:pointer; transition:background .12s ease}
+a.row.rowlink:hover{background:color-mix(in oklab, var(--muted) 55%, transparent)}
+.row .chev{color:var(--muted-foreground); font-weight:400; margin-left:4px; transition:color .12s ease}
+a.row.rowlink:hover .chev{color:var(--primary)}
+.row.catsub{border-top:1px solid var(--border)}
+.row.catsub .name,.row.catsub .amt{color:var(--muted-foreground); font-weight:400}
+.triptotal{padding:14px 18px; margin-top:16px}
+.row .per{font-size:12px; color:var(--muted-foreground); text-align:right; margin-top:2px}
+
+/* balance chart — card: header · body · footer */
+.chart-card{padding:0; overflow:hidden}
+.chart-head{display:flex; justify-content:space-between; align-items:flex-start; gap:14px; flex-wrap:wrap; padding:14px 16px 4px}
+.chart-title{font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted-foreground)}
+.chart-desc{font-size:11px; letter-spacing:.02em; color:var(--muted-foreground); margin-top:3px}
+.chart-cur{font-size:16px; font-weight:600; color:var(--foreground); font-variant-numeric:tabular-nums}
+.chart-cur span{font-size:11px; color:var(--muted-foreground); font-weight:500; margin-left:4px}
+.chart-body{position:relative; padding:2px 12px 4px; cursor:crosshair}
+.bchart{display:block; width:100%; height:auto; overflow:visible; touch-action:none}
+.bchart .grid{stroke:var(--border); stroke-width:.75; vector-effect:non-scaling-stroke}
+.bchart .glabel{fill:var(--muted-foreground); font-size:8.5px; opacity:.75; font-family:inherit}
+.bchart .xlabel{fill:var(--muted-foreground); font-size:8.5px; font-family:inherit}
+.bchart .cross{stroke:var(--muted-foreground); stroke-width:.75; opacity:0; vector-effect:non-scaling-stroke}
+.bchart .hdot{opacity:0}
+.btip{position:absolute; top:6px; pointer-events:none; opacity:0; transition:opacity .1s ease;
+  background:var(--card); border:1px solid var(--border); border-radius:9px; box-shadow:var(--shadow);
+  padding:5px 9px; font-size:11px; line-height:1.35; white-space:nowrap; z-index:2}
+.btip b{display:block; color:var(--foreground); font-weight:600}
+.btip span{display:block; color:var(--muted-foreground)}
+.chart-foot{padding:9px 16px 12px; border-top:1px solid var(--border)}
+.chart-foot-main{display:flex; align-items:center; flex-wrap:wrap; gap:6px; font-size:12px; color:var(--foreground)}
+.chart-foot-main .foot-io{color:var(--muted-foreground); font-weight:400; letter-spacing:.02em}
+.chart-foot-sub{font-size:11px; color:var(--muted-foreground); margin-top:3px}
+.trend-icon{width:.95em; height:.95em; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; color:var(--chart-2)}
+
+/* chart window toggle (flux page only) */
+.chart-toggle{display:flex; justify-content:flex-end; margin-bottom:10px}
+.chart-toggle button{font:inherit; font-size:11px; color:var(--muted-foreground); background:var(--card); border:1px solid var(--border); padding:5px 13px; cursor:pointer; letter-spacing:.04em; transition:color .12s ease, background .12s ease}
+.chart-toggle button:first-child{border-radius:8px 0 0 8px}
+.chart-toggle button:last-child{border-radius:0 8px 8px 0; border-left:0}
+.chart-toggle button:hover{color:var(--foreground)}
+.chart-toggle button.on{color:var(--foreground); background:var(--muted); font-weight:600}
+
+footer{margin-top:24px; text-align:center; font-size:12px; color:var(--muted-foreground); letter-spacing:.04em}

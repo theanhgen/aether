@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>AETHER</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d0f12" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AETHER">
+<meta property="og:description" content="reserve · read-only node">
+<meta property="og:url" content="https://theanhgen.github.io/aether/">
+<meta property="og:image" content="https://theanhgen.github.io/aether/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AETHER">
+<meta name="twitter:description" content="reserve · read-only node">
+<meta name="twitter:image" content="https://theanhgen.github.io/aether/og.png">
+<link rel="stylesheet" href="aether.css">
+</head>
+<body class="focus">
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div>
+        <h1><span class="dot"></span>AETHER</h1>
+        <div class="sub">reserve</div>
+      </div>
+    </div>
+    <div class="updated" id="updated"></div>
+  </header>
+
+  <section class="card hero">
+    <div class="hero-top">
+      <span class="label">core charge</span>
+    </div>
+    <div class="now tnum"><span id="now">—</span><span class="cur">AU</span></div>
+    <div class="accrued" id="accrued"></div>
+    <dl class="vitals">
+      <div><dt>last sync</dt><dd class="tnum"><b id="anchor"></b> AU</dd></div>
+      <div><dt>influx</dt><dd class="tnum" id="vInflux"></dd></div>
+      <div><dt>drift</dt><dd class="tnum" id="vDrift"></dd></div>
+      <div><dt>rate</dt><dd class="tnum" id="vRate"></dd></div>
+    </dl>
+  </section>
+
+  <a class="navlink" href="manifest.html">manifest ⟢</a>
+</div>
+
+<script src="data.js"></script>
+<script>
+// live tick — balance grows as interest accrues; accrued line shows interest since sync
+function tick(){
+  const n = liveNow();
+  document.getElementById("now").textContent = cz2(n);
+  document.getElementById("accrued").textContent = "+" + cz2(n - ANCHOR.balance) + " since sync";
+}
+tick();
+setInterval(tick, 1000);
+document.getElementById("anchor").textContent = cz2(ANCHOR.balance);
+document.getElementById("updated").textContent = "sync ⟢ " + shortDate;
+document.getElementById("vInflux").textContent = "+" + cz(WEEKLY_IN) + " / wk";
+document.getElementById("vDrift").textContent  = "+" + cz2(driftPerDay) + " / day";
+document.getElementById("vRate").textContent   = (RATE * 100).toFixed(2).replace(".", ",") + "%";
+</script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>AETHER · flux</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d0f12" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AETHER">
+<meta property="og:description" content="reserve · read-only node">
+<meta property="og:url" content="https://theanhgen.github.io/aether/">
+<meta property="og:image" content="https://theanhgen.github.io/aether/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AETHER">
+<meta name="twitter:description" content="reserve · read-only node">
+<meta name="twitter:image" content="https://theanhgen.github.io/aether/og.png">
+<link rel="stylesheet" href="aether.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="brand" href="manifest.html">
+      <div>
+        <h1><span class="dot"></span>AETHER</h1>
+        <div class="sub">flux</div>
+      </div>
+    </a>
+    <div class="updated" id="updated"></div>
+  </header>
+
+  <div class="chart-toggle" id="btoggle">
+    <button data-w="90">90d</button>
+    <button data-w="all" class="on">all</button>
+  </div>
+  <div class="card chart-card" id="fchart" style="margin-bottom:26px"></div>
+
+  <h2>all movements</h2>
+  <div class="card log" id="flux"></div>
+  <div class="chart-foot-sub" style="margin-top:10px">influx &amp; efflux · drift shown daily on the chart</div>
+
+  <a class="navlink" href="manifest.html" style="margin-top:20px">⟢ manifest</a>
+
+  <footer>AETHER · read-only node · resync ⟢ each cycle</footer>
+</div>
+
+<script src="data.js"></script>
+<script src="chart.js"></script>
+<script>
+document.getElementById("updated").textContent = "sync ⟢ " + shortDate;
+document.getElementById("flux").innerHTML = FLUX.map(fluxRow).join("");
+
+// balance chart with a 90d / full-history toggle (only on this page)
+const chartRoot = document.getElementById("fchart");
+mountBalanceChart(chartRoot, Infinity);   // all movements page defaults to full history
+document.querySelectorAll("#btoggle button").forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll("#btoggle button").forEach(x => x.classList.remove("on"));
+    b.classList.add("on");
+    mountBalanceChart(chartRoot, b.dataset.w === "all" ? Infinity : Number(b.dataset.w));
+  };
+});
+</script>
+</body>
+</html>

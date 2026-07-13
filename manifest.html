@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>AETHER · manifest</title>
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0d0f12" media="(prefers-color-scheme: dark)">
+<meta property="og:type" content="website">
+<meta property="og:title" content="AETHER">
+<meta property="og:description" content="reserve · read-only node">
+<meta property="og:url" content="https://theanhgen.github.io/aether/">
+<meta property="og:image" content="https://theanhgen.github.io/aether/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AETHER">
+<meta name="twitter:description" content="reserve · read-only node">
+<meta name="twitter:image" content="https://theanhgen.github.io/aether/og.png">
+<link rel="stylesheet" href="aether.css">
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <a class="brand" href="index.html">
+      <div>
+        <h1><span class="dot"></span>AETHER</h1>
+        <div class="sub">manifest</div>
+      </div>
+    </a>
+    <div class="updated" id="updated"></div>
+  </header>
+
+  <div class="kpis">
+    <div class="card kpi"><div class="k">influx / wk</div><div class="v tnum" id="kInflux">—</div></div>
+    <div class="card kpi"><div class="k">drift / day</div><div class="v tnum" id="kDrift">—</div></div>
+    <div class="card kpi"><div class="k">rate</div><div class="v tnum" id="kRate">—</div></div>
+  </div>
+
+  <div class="card chart-card" id="balchart" style="margin-top:4px"></div>
+
+  <h2 style="margin-top:28px">flux</h2>
+  <div class="card log" id="flux"></div>
+  <a class="navlink" href="flux.html" style="margin-top:10px">all flux ⟢</a>
+
+  <h2 style="margin-top:28px">discharge log</h2>
+  <div class="card log" id="log"></div>
+
+  <a class="navlink" href="index.html" style="margin-top:20px">⟢ core charge</a>
+
+  <footer>AETHER · read-only node · resync ⟢ each cycle</footer>
+</div>
+
+<script src="data.js"></script>
+<script src="chart.js"></script>
+<script>
+document.getElementById("updated").textContent = "sync ⟢ " + shortDate;
+
+// KPIs — derived from data.js (single source of truth)
+document.getElementById("kInflux").textContent = "+" + cz(WEEKLY_IN) + " AU";
+document.getElementById("kDrift").textContent  = "+" + cz2(driftPerDay) + " AU";
+document.getElementById("kRate").textContent   = (RATE * 100).toFixed(2).replace(".", ",") + "%";
+
+// balance chart — fixed 90-day window (toggle lives on flux.html only)
+mountBalanceChart(document.getElementById("balchart"), WINDOW_DAYS);
+
+// flux — latest 3 movements only (interest excluded); full list on flux.html
+document.getElementById("flux").innerHTML = FLUX.slice(0, 3).map(fluxRow).join("");
+
+// discharge log — pot-funded trips only (empty until one exists)
+document.getElementById("log").innerHTML = LOG.length
+  ? LOG.map(t => {
+      const href = t.items && t.items.length ? `burn.html#${t.name.toLowerCase()}` : null;
+      const inner = `
+      <div>
+        <div class="name">${t.name}${href ? ' <span class="chev">→</span>' : ''}</div>
+        <div class="dates">${t.dates}</div>
+      </div>
+      <div>
+        <div class="amt tnum">${czMoney(t.total ?? 0)} AU</div>
+        <div class="per tnum">${czMoney(t.per ?? 0)} / unit</div>
+      </div>`;
+      return href
+        ? `<a class="row rowlink" href="${href}">${inner}</a>`
+        : `<div class="row">${inner}</div>`;
+    }).join("")
+  : `<div class="row"><div class="dates">— nothing discharged yet —</div></div>`;
+</script>
+</body>
+</html>
