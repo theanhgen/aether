@@ -43,6 +43,12 @@ const BALANCE = [
 // (thrust | berth | galley | survey | aux). total should equal their sum.
 const LOG = [
   {
+    name: "Antares", dates: "17 Oct – 8 Nov 2026", total: 39682.21, per: 19841.11,
+    items: [
+      { date: "16 Jul 2026", category: "thrust", amount: 39682.21 }
+    ]
+  },
+  {
     name: "Altair", dates: "10 – 12 Jul 2026", total: 2776.12, per: 1388.06,
     items: [
       { date: "02 Jul 2026", category: "thrust", amount: 2776.12 }
