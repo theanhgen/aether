@@ -49,6 +49,12 @@ const LOG = [
     ]
   },
   {
+    name: "Rigel", dates: "25 – 27 Jul 2026", total: 9042, per: 4521,
+    items: [
+      { date: "12 Jun 2026", category: "berth", amount: 9042 }
+    ]
+  },
+  {
     name: "Altair", dates: "10 – 12 Jul 2026", total: 2776.12, per: 1388.06,
     items: [
       { date: "02 Jul 2026", category: "thrust", amount: 2776.12 }
