@@ -2,8 +2,8 @@
 
 // Confirmed balance + when it was read off the app. Page estimates "now" from drift.
 const ANCHOR = {
-  balance: 74800.25,
-  atISO: "2026-07-11T20:22:00+02:00"
+  balance: 78822.21,   // prior 74 800,25 + drift + confirmed 4 000 influx (15 Jul)
+  atISO: "2026-07-15T18:34:00+02:00"
 };
 const RATE = 0.0275;       // 2.75 % p.a. net
 const WEEKLY_IN = 2000;    // top-up per week (2 × 1 000)
@@ -13,6 +13,7 @@ const WINDOW_DAYS = 90;    // balance chart: rolling window length
 // negative = efflux (out). Routine weekly top-ups between are omitted (they're
 // summarised by the influx stat); daily interest is the drift stat.
 const FLUX = [
+  { date: "15 Jul 2026", amount:  4000 },   // extra influx (2 × 2 000)
   { date: "11 Jul 2026", amount:  2000 },
   { date: "03 Jul 2026", amount:  2000 },
   { date: "02 Jul 2026", amount: -2776.12 },
@@ -32,7 +33,8 @@ const BALANCE = [
   { d: "2026-06-20", v: 71455.71 },   // weekly influx + drift
   { d: "2026-07-02", v: 70751.02 },   // after the −2 776 efflux
   { d: "2026-07-03", v: 72756.33 },   // +2 000
-  { d: "2026-07-11", v: 74800.25 }    // +2 000 — current anchor
+  { d: "2026-07-11", v: 74800.25 },   // +2 000
+  { d: "2026-07-15", v: 78822.21 }    // +4 000 influx — current anchor
 ];
 
 // DISCHARGE LOG — trips paid from the reserve; the amount is what the reserve
