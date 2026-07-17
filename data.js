@@ -2,8 +2,8 @@
 
 // Confirmed balance + when it was read off the app. Page estimates "now" from drift.
 const ANCHOR = {
-  balance: 63703.98,   // 78 822,21 (15 Jul app) − 15 118,23 shared trip charged from joint (17 Jul)
-  atISO: "2026-07-17T12:00:00+02:00"
+  balance: 14215.95,   // real app reading 17 Jul 12:16 — all trips discharged from the pocket
+  atISO: "2026-07-17T12:16:00+02:00"
 };
 const RATE = 0.0275;       // 2.75 % p.a. net
 const WEEKLY_IN = 2000;    // top-up per week (2 × 1 000)
@@ -13,6 +13,8 @@ const WINDOW_DAYS = 90;    // balance chart: rolling window length
 // negative = efflux (out). Routine weekly top-ups between are omitted (they're
 // summarised by the influx stat); daily interest is the drift stat.
 const FLUX = [
+  { date: "17 Jul 2026", amount: -39682.21 },  // Antares discharged
+  { date: "17 Jul 2026", amount:  -9042 },     // Rigel discharged
   { date: "15 Jul 2026", amount:  4000 },      // extra influx (2 × 2 000)
   { date: "12 Jul 2026", amount: -8181.83 },   // Altair — Sun on-ground
   { date: "12 Jul 2026", amount:  -594.11 },   // Altair — Prague Uber
@@ -39,7 +41,7 @@ const BALANCE = [
   { d: "2026-07-03", v: 72756.33 },   // +2 000
   { d: "2026-07-11", v: 74800.25 },   // +2 000
   { d: "2026-07-15", v: 78822.21 },   // +4 000 influx
-  { d: "2026-07-17", v: 63703.98 }    // −15 118,23 shared trip charged from joint — current anchor
+  { d: "2026-07-17", v: 14215.95 }    // all trips discharged — real reading, current anchor
 ];
 
 // DISCHARGE LOG — trips paid from the reserve; the amount is what the reserve
