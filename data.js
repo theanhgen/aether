@@ -55,21 +55,21 @@ const LOG = [
     ]
   },
   {
-    name: "Cargo", dates: "12 Jul 2026", total: 3801, per: 1900.5,
+    name: "Cargo", dates: "12 Jul 2026", total: 3800.62, per: 1900.31,
     items: [
-      { date: "12 Jul 2026", category: "aux", amount: 3801 }
+      { date: "12 Jul 2026", category: "aux", amount: 3800.62 }
     ]
   },
   {
-    name: "Altair", dates: "10 – 12 Jul 2026", total: 14457, per: 7228.5,
+    name: "Altair", dates: "10 – 12 Jul 2026", total: 14194.78, per: 7097.39,
     items: [
-      { date: "11 Jul 2026", category: "berth",  amount: 1571 },
-      { date: "11 Jul 2026", category: "galley", amount: 7224 },
-      { date: "02 Jul 2026", category: "thrust", amount: 3138 },
-      { date: "11 Jul 2026", category: "thrust", amount: 1168 },
-      { date: "12 Jul 2026", category: "thrust", amount:  594 },
-      { date: "12 Jul 2026", category: "aux",    amount:  203 },
-      { date: "11 Jul 2026", category: "survey", amount:  559 }
+      { date: "11 Jul 2026", category: "berth",  amount: 1570.57 },
+      { date: "11 Jul 2026", category: "galley", amount: 7223.16 },
+      { date: "03 Jul 2026", category: "thrust", amount: 2877.17 },
+      { date: "11 Jul 2026", category: "thrust", amount: 1168.24 },
+      { date: "12 Jul 2026", category: "thrust", amount:  594.11 },
+      { date: "12 Jul 2026", category: "aux",    amount:  202.61 },
+      { date: "11 Jul 2026", category: "survey", amount:  558.92 }
     ]
   }
 ];
