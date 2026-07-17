@@ -84,28 +84,25 @@ function mountBalanceChart(root, windowDays) {
     }
     return wp[wp.length - 1].v;
   };
-  // ordered path nodes, doubled at each event day (before/after = the vertical step)
-  const nodes = [{ t: wp[0].t, v: wp[0].v }];
-  for (let i = 0; i < wp.length - 1; i++) {
-    const A = wp[i], B = wp[i + 1], { evs, R, span } = segOf(A, B);
-    let cum = 0;
-    for (const e of evs) {
-      const drift = R * (e.t - A.t) / span;
-      nodes.push({ t: e.t, v: A.v + drift + cum });
-      cum += e.net;
-      nodes.push({ t: e.t, v: A.v + drift + cum });
-    }
-    nodes.push({ t: B.t, v: B.v });
-  }
+  // sample the flux-aware value daily, then smooth (Catmull-Rom → bézier) — soft line
+  // that still dips at effluxes (each drop happens within a day, so it reads as a steep curve)
+  const daily = [];
+  for (let t = tMin; t < tMax; t += DAY) daily.push({ t, v: valueAt(t) });
+  daily.push({ t: tMax, v: valueAt(tMax) });
 
-  const vMin = Math.min(...nodes.map(p => p.v)), vMax = Math.max(...nodes.map(p => p.v));
+  const vMin = Math.min(...daily.map(p => p.v)), vMax = Math.max(...daily.map(p => p.v));
   const vpad = (vMax - vMin) * 0.12 || 1, lo = vMin - vpad, hi = vMax + vpad;
   const X = t => PL + (t - tMin) / (tMax - tMin) * iw;
   const Y = v => PT + (1 - (v - lo) / (hi - lo)) * ih;
 
-  // straight polyline through the nodes — the vertical segments at events are the dips/jumps
-  let d = `M${X(nodes[0].t).toFixed(1)},${Y(nodes[0].v).toFixed(1)}`;
-  for (let i = 1; i < nodes.length; i++) d += ` L${X(nodes[i].t).toFixed(1)},${Y(nodes[i].v).toFixed(1)}`;
+  const P = daily.map(p => ({ px: X(p.t), py: Y(p.v) }));
+  let d = `M${P[0].px.toFixed(1)},${P[0].py.toFixed(1)}`;
+  for (let i = 0; i < P.length - 1; i++) {
+    const p0 = P[i - 1] || P[i], p1 = P[i], p2 = P[i + 1], p3 = P[i + 2] || p2;
+    const c1x = p1.px + (p2.px - p0.px) / 6, c1y = p1.py + (p2.py - p0.py) / 6;
+    const c2x = p2.px - (p3.px - p1.px) / 6, c2y = p2.py - (p3.py - p1.py) / 6;
+    d += ` C${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${p2.px.toFixed(1)},${p2.py.toFixed(1)}`;
+  }
 
   // horizontal gridlines — step adapts so 3–5 lines always show
   const niceSteps = [1000, 2000, 5000, 10000, 20000, 50000, 100000];
