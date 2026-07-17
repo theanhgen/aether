@@ -102,10 +102,19 @@ function mountBalanceChart(root, windowDays) {
     const f = b.t === a.t ? 0 : (t - a.t) / (b.t - a.t);
     return a.v + (b.v - a.v) * f;
   };
-  const events = (typeof FLUX !== "undefined" ? FLUX : [])
-    .map(f => ({ t: parseDay(f.date), amount: f.amount }))
-    .filter(e => e.t >= tMin && e.t <= tMax)
-    .map(e => ({ t: e.t, x: X(e.t), y: Y(lineYAt(e.t)), v: lineYAt(e.t), inflow: e.amount >= 0, amount: e.amount }));
+  // aggregate flux by day so a day with several movements shows the cumulative
+  // (influx and efflux summed separately), not just the last entry
+  const dayAgg = {};
+  (typeof FLUX !== "undefined" ? FLUX : []).forEach(f => {
+    const t = parseDay(f.date);
+    if (t < tMin || t > tMax) return;
+    const a = dayAgg[t] || (dayAgg[t] = { t, in: 0, out: 0 });
+    if (f.amount >= 0) a.in += f.amount; else a.out += f.amount;
+  });
+  const events = Object.values(dayAgg).map(a => {
+    const net = a.in + a.out;
+    return { t: a.t, x: X(a.t), y: Y(lineYAt(a.t)), in: a.in, out: a.out, net, inflow: net >= 0 };
+  });
   const evDots = events.map(e =>
     `<circle cx="${e.x.toFixed(1)}" cy="${e.y.toFixed(1)}" r="3" fill="var(${e.inflow ? "--chart-2" : "--primary"})" stroke="var(--card)" stroke-width="1.5"/>`).join("");
 
@@ -130,8 +139,8 @@ function mountBalanceChart(root, windowDays) {
     ? `<svg viewBox="0 0 24 24" class="trend-icon"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>`
     : `<svg viewBox="0 0 24 24" class="trend-icon"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>`;
   // in/out sums over the window (from flux events), shown in brackets
-  const inSum  = events.filter(e => e.inflow).reduce((s, e) => s + e.amount, 0);
-  const outSum = events.filter(e => !e.inflow).reduce((s, e) => s + e.amount, 0);
+  const inSum  = events.reduce((s, e) => s + e.in, 0);
+  const outSum = events.reduce((s, e) => s + e.out, 0);
   const io = `<span class="foot-io">[in +${cz(inSum)} · out ${outSum ? "−" + cz(Math.abs(outSum)) : "0"}]</span>`;
   root.querySelector(".chart-foot-main").innerHTML = `${up ? "+" : "−"}${cz(Math.abs(delta))} AU since ${fmt(tMin)} ${icon} ${io}`;
 
@@ -151,8 +160,12 @@ function mountBalanceChart(root, windowDays) {
     hdot.setAttribute("cx", px); hdot.setAttribute("cy", py); hdot.style.opacity = 1;
     const ds = _fmtDay(t, { day: "numeric", month: "short", year: "numeric" });
     const ev = eventByDay[Math.round((t - tMin) / DAY)];
-    tip.innerHTML = `<b>${cz2(bal)} AU</b><span>drift +${cz2(bal * dayRate)} · ${ds}</span>`
-      + (ev ? `<span style="color:var(${ev.inflow ? "--chart-2" : "--primary"})">${ev.inflow ? "influx +" : "efflux −"}${czMoney(Math.abs(ev.amount))} AU</span>` : "");
+    let evHtml = "";
+    if (ev) {
+      if (ev.in > 0)  evHtml += `<span style="color:var(--chart-2)">influx +${czMoney(ev.in)} AU</span>`;
+      if (ev.out < 0) evHtml += `<span style="color:var(--primary)">efflux −${czMoney(Math.abs(ev.out))} AU</span>`;
+    }
+    tip.innerHTML = `<b>${cz2(bal)} AU</b><span>drift +${cz2(bal * dayRate)} · ${ds}</span>` + evHtml;
     tip.style.opacity = 1;
     const br = body.getBoundingClientRect(), tw = tip.offsetWidth;
     const screenX = r.left + px / W * r.width;

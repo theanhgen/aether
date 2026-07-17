@@ -2,8 +2,8 @@
 
 // Confirmed balance + when it was read off the app. Page estimates "now" from drift.
 const ANCHOR = {
-  balance: 78822.21,   // prior 74 800,25 + drift + confirmed 4 000 influx (15 Jul)
-  atISO: "2026-07-15T18:34:00+02:00"
+  balance: 63703.98,   // 78 822,21 (15 Jul app) − 15 118,23 shared trip charged from joint (17 Jul)
+  atISO: "2026-07-17T12:00:00+02:00"
 };
 const RATE = 0.0275;       // 2.75 % p.a. net
 const WEEKLY_IN = 2000;    // top-up per week (2 × 1 000)
@@ -38,7 +38,8 @@ const BALANCE = [
   { d: "2026-07-02", v: 70751.02 },   // after the −2 776 efflux
   { d: "2026-07-03", v: 72756.33 },   // +2 000
   { d: "2026-07-11", v: 74800.25 },   // +2 000
-  { d: "2026-07-15", v: 78822.21 }    // +4 000 influx — current anchor
+  { d: "2026-07-15", v: 78822.21 },   // +4 000 influx
+  { d: "2026-07-17", v: 63703.98 }    // −15 118,23 shared trip charged from joint — current anchor
 ];
 
 // DISCHARGE LOG — trips paid from the reserve; the amount is what the reserve
