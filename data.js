@@ -61,11 +61,11 @@ const LOG = [
     ]
   },
   {
-    name: "Altair", dates: "10 – 12 Jul 2026", total: 14194.78, per: 7097.39,
+    name: "Altair", dates: "10 – 12 Jul 2026", total: 14093.73, per: 7046.87,
     items: [
       { date: "11 Jul 2026", category: "berth",  amount: 1570.57 },
       { date: "11 Jul 2026", category: "galley", amount: 7223.16 },
-      { date: "03 Jul 2026", category: "thrust", amount: 2877.17 },
+      { date: "02 Jul 2026", category: "thrust", amount: 2776.12 },
       { date: "11 Jul 2026", category: "thrust", amount: 1168.24 },
       { date: "12 Jul 2026", category: "thrust", amount:  594.11 },
       { date: "12 Jul 2026", category: "aux",    amount:  202.61 },
