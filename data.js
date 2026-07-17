@@ -13,8 +13,7 @@ const WINDOW_DAYS = 90;    // balance chart: rolling window length
 // negative = efflux (out). Routine weekly top-ups between are omitted (they're
 // summarised by the influx stat); daily interest is the drift stat.
 const FLUX = [
-  { date: "17 Jul 2026", amount: -39682.21 },  // Antares discharged
-  { date: "17 Jul 2026", amount:  -9042 },     // Rigel discharged
+  { date: "16 Jul 2026", amount: -39682.21 },  // Antares — flight charged
   { date: "15 Jul 2026", amount:  4000 },      // extra influx (2 × 2 000)
   { date: "12 Jul 2026", amount: -8181.83 },   // Altair — Sun on-ground
   { date: "12 Jul 2026", amount:  -594.11 },   // Altair — Prague Uber
@@ -26,6 +25,7 @@ const FLUX = [
   { date: "26 Jun 2026", amount:  2000 },
   { date: "20 Jun 2026", amount:  2000 },
   { date: "19 Jun 2026", amount:  2000 },
+  { date: "12 Jun 2026", amount:  -9042 },     // Rigel — accommodation charged
   { date: "31 Mar 2026", amount: 27000 },   // injection
   { date: "14 Mar 2026", amount: 40000 }    // opening (2 × 20 000)
 ];

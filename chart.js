@@ -53,25 +53,59 @@ function mountBalanceChart(root, windowDays) {
       wp.unshift({ t: tMin, v: before.v + (after.v - before.v) * (tMin - before.t) / (after.t - before.t) });
     else if (after) wp.unshift({ t: tMin, v: after.v });
   }
-  const vMin = Math.min(...wp.map(p => p.v)), vMax = Math.max(...wp.map(p => p.v));
+  // aggregate flux to one net movement per day (sorted) — drives the stepped line,
+  // the event dots, and the tooltip
+  const dayMap = {};
+  (typeof FLUX !== "undefined" ? FLUX : []).forEach(f => {
+    const t = parseDay(f.date);
+    if (t < tMin || t > tMax) return;
+    const a = dayMap[t] || (dayMap[t] = { t, in: 0, out: 0 });
+    if (f.amount >= 0) a.in += f.amount; else a.out += f.amount;
+  });
+  const dayEvents = Object.values(dayMap).sort((a, b) => a.t - b.t).map(e => ({ ...e, net: e.in + e.out }));
+
+  // Flux-aware balance line: inside each gap between real readings, step by each day's
+  // net flux and spread the residual (interest / unlogged) linearly, so the curve lands
+  // on every real reading yet visibly dips at effluxes and jumps at influxes.
+  const segOf = (A, B) => {
+    const evs = dayEvents.filter(e => e.t > A.t && e.t <= B.t);
+    return { evs, R: (B.v - A.v) - evs.reduce((s, e) => s + e.net, 0), span: (B.t - A.t) || 1 };
+  };
+  const valueAt = t => {
+    if (t <= wp[0].t) return wp[0].v;
+    if (t >= wp[wp.length - 1].t) return wp[wp.length - 1].v;
+    for (let i = 0; i < wp.length - 1; i++) {
+      const A = wp[i], B = wp[i + 1];
+      if (t >= A.t && t <= B.t) {
+        const { evs, R, span } = segOf(A, B);
+        const cum = evs.filter(e => e.t <= t).reduce((s, e) => s + e.net, 0);
+        return A.v + R * (t - A.t) / span + cum;
+      }
+    }
+    return wp[wp.length - 1].v;
+  };
+  // ordered path nodes, doubled at each event day (before/after = the vertical step)
+  const nodes = [{ t: wp[0].t, v: wp[0].v }];
+  for (let i = 0; i < wp.length - 1; i++) {
+    const A = wp[i], B = wp[i + 1], { evs, R, span } = segOf(A, B);
+    let cum = 0;
+    for (const e of evs) {
+      const drift = R * (e.t - A.t) / span;
+      nodes.push({ t: e.t, v: A.v + drift + cum });
+      cum += e.net;
+      nodes.push({ t: e.t, v: A.v + drift + cum });
+    }
+    nodes.push({ t: B.t, v: B.v });
+  }
+
+  const vMin = Math.min(...nodes.map(p => p.v)), vMax = Math.max(...nodes.map(p => p.v));
   const vpad = (vMax - vMin) * 0.12 || 1, lo = vMin - vpad, hi = vMax + vpad;
   const X = t => PL + (t - tMin) / (tMax - tMin) * iw;
   const Y = v => PT + (1 - (v - lo) / (hi - lo)) * ih;
 
-  // densify to daily then smooth (Catmull-Rom → bézier; dense points ⇒ tiny overshoot)
-  const daily = []; let j = 0;
-  for (let t = tMin; t <= tMax; t += DAY) {
-    while (j < wp.length - 2 && wp[j + 1].t < t) j++;
-    const a = wp[j], b = wp[j + 1], f = (t - a.t) / (b.t - a.t);
-    daily.push({ px: X(t), py: Y(a.v + (b.v - a.v) * f) });
-  }
-  let d = `M${daily[0].px.toFixed(1)},${daily[0].py.toFixed(1)}`;
-  for (let i = 0; i < daily.length - 1; i++) {
-    const p0 = daily[i - 1] || daily[i], p1 = daily[i], p2 = daily[i + 1], p3 = daily[i + 2] || p2;
-    const c1x = p1.px + (p2.px - p0.px) / 6, c1y = p1.py + (p2.py - p0.py) / 6;
-    const c2x = p2.px - (p3.px - p1.px) / 6, c2y = p2.py - (p3.py - p1.py) / 6;
-    d += ` C${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${p2.px.toFixed(1)},${p2.py.toFixed(1)}`;
-  }
+  // straight polyline through the nodes — the vertical segments at events are the dips/jumps
+  let d = `M${X(nodes[0].t).toFixed(1)},${Y(nodes[0].v).toFixed(1)}`;
+  for (let i = 1; i < nodes.length; i++) d += ` L${X(nodes[i].t).toFixed(1)},${Y(nodes[i].v).toFixed(1)}`;
 
   // horizontal gridlines — step adapts so 3–5 lines always show
   const niceSteps = [1000, 2000, 5000, 10000, 20000, 50000, 100000];
@@ -95,26 +129,10 @@ function mountBalanceChart(root, windowDays) {
     }
   }
 
-  // flux event markers, sitting on the line (green influx / orange efflux)
-  const lineYAt = t => {
-    let a = wp[0], b = wp[wp.length - 1];
-    for (let i = 0; i < wp.length - 1; i++) if (t >= wp[i].t && t <= wp[i + 1].t) { a = wp[i]; b = wp[i + 1]; break; }
-    const f = b.t === a.t ? 0 : (t - a.t) / (b.t - a.t);
-    return a.v + (b.v - a.v) * f;
-  };
-  // aggregate flux by day so a day with several movements shows the cumulative
-  // (influx and efflux summed separately), not just the last entry
-  const dayAgg = {};
-  (typeof FLUX !== "undefined" ? FLUX : []).forEach(f => {
-    const t = parseDay(f.date);
-    if (t < tMin || t > tMax) return;
-    const a = dayAgg[t] || (dayAgg[t] = { t, in: 0, out: 0 });
-    if (f.amount >= 0) a.in += f.amount; else a.out += f.amount;
-  });
-  const events = Object.values(dayAgg).map(a => {
-    const net = a.in + a.out;
-    return { t: a.t, x: X(a.t), y: Y(lineYAt(a.t)), in: a.in, out: a.out, net, inflow: net >= 0 };
-  });
+  // flux event dots — sit at the post-event balance (bottom of an efflux dip / top of a jump)
+  const events = dayEvents.map(e => ({
+    t: e.t, x: X(e.t), y: Y(valueAt(e.t)), in: e.in, out: e.out, net: e.net, inflow: e.net >= 0
+  }));
   const evDots = events.map(e =>
     `<circle cx="${e.x.toFixed(1)}" cy="${e.y.toFixed(1)}" r="3" fill="var(${e.inflow ? "--chart-2" : "--primary"})" stroke="var(--card)" stroke-width="1.5"/>`).join("");
 
@@ -155,7 +173,7 @@ function mountBalanceChart(root, windowDays) {
     const vbx = (cx - r.left) / r.width * W;
     let t = tMin + Math.max(0, Math.min(1, (vbx - PL) / iw)) * (tMax - tMin);
     t = Math.max(tMin, Math.min(tMax, tMin + Math.round((t - tMin) / DAY) * DAY));  // snap to day
-    const bal = lineYAt(t), px = X(t), py = Y(bal);
+    const bal = valueAt(t), px = X(t), py = Y(bal);
     cross.setAttribute("x1", px); cross.setAttribute("x2", px); cross.style.opacity = 1;
     hdot.setAttribute("cx", px); hdot.setAttribute("cy", py); hdot.style.opacity = 1;
     const ds = _fmtDay(t, { day: "numeric", month: "short", year: "numeric" });
