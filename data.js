@@ -65,7 +65,7 @@ const LOG = [
     ]
   },
   {
-    name: "Cargo", dates: "12 Jul 2026", total: 4003, per: 4003,
+    name: "Cargo", dates: "12 Jul 2026", total: 4003, per: 2001.5,
     items: [
       { date: "12 Jul 2026", category: "aux", amount: 4003 }
     ]
