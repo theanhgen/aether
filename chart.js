@@ -41,6 +41,19 @@ function mountBalanceChart(root, windowDays) {
   const iw = W - PL - PR, ih = H - PT - PB;
 
   const all = BALANCE.map(p => ({ t: parseDay(p.d), v: p.v }));
+  // Extend the line to today. Between the last real reading and now the balance only
+  // drifts with interest, so project it forward — otherwise the chart stops at the last
+  // sync and reads as stale. The projected point is marked `est` so the axis label can
+  // say "now" instead of pretending it's a reading.
+  {
+    const last = all[all.length - 1];
+    const n = new Date();
+    const todayT = Date.UTC(n.getFullYear(), n.getMonth(), n.getDate());
+    if (todayT > last.t) {
+      const days = (todayT - last.t) / DAY;
+      all.push({ t: todayT, v: last.v * Math.pow(1 + dayRate, days), est: true });
+    }
+  }
   const tMax = all[all.length - 1].t;
   const full = !isFinite(windowDays);
   const tMin = full ? all[0].t : tMax - windowDays * DAY;
@@ -143,7 +156,9 @@ function mountBalanceChart(root, windowDays) {
 
   // header + footer
   const fmt = t => _fmtDay(t, { day: "numeric", month: "short" });
-  root.querySelector(".chart-desc").textContent = (full ? "full · " : "last " + windowDays + "d · ") + fmt(tMin) + " – " + fmt(tMax);
+  const endsToday = all[all.length - 1].est;
+  root.querySelector(".chart-desc").textContent = (full ? "full · " : "last " + windowDays + "d · ")
+    + fmt(tMin) + " – " + (endsToday ? "now" : fmt(tMax));
   // current value — live estimate with full detail (matches the main page), ticking
   if (root._curTick) clearInterval(root._curTick);
   const setCur = () => { const el = root.querySelector(".chart-cur"); if (el) el.innerHTML = cz2(liveNow()) + ' <span>AU</span>'; };

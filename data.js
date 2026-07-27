@@ -2,8 +2,8 @@
 
 // Confirmed balance + when it was read off the app. Page estimates "now" from drift.
 const ANCHOR = {
-  balance: 14215.95,   // real app reading 17 Jul 12:16 — all trips discharged from the pocket
-  atISO: "2026-07-17T12:16:00+02:00"
+  balance: 12959.87,   // real app reading 27 Jul 21:35 — after the Rigel remainder was discharged
+  atISO: "2026-07-27T21:35:00+02:00"
 };
 const RATE = 0.0275;       // 2.75 % p.a. net
 const WEEKLY_IN = 2000;    // top-up per week (2 × 1 000)
@@ -13,6 +13,8 @@ const WINDOW_DAYS = 90;    // balance chart: rolling window length
 // negative = efflux (out). Routine weekly top-ups between are omitted (they're
 // summarised by the influx stat); daily interest is the drift stat.
 const FLUX = [
+  { date: "27 Jul 2026", amount: -3267.32 },   // Rigel — on-ground remainder discharged
+  { date: "24 Jul 2026", amount:  2000 },      // weekly top-up (2 × 1 000)
   { date: "17 Jul 2026", amount:  2000 },      // weekly top-up (2 × 1 000)
   { date: "16 Jul 2026", amount: -39682.21 },  // Antares — flight charged
   { date: "15 Jul 2026", amount:  4000 },      // extra influx (2 × 2 000)
@@ -42,7 +44,9 @@ const BALANCE = [
   { d: "2026-07-03", v: 72756.33 },   // +2 000
   { d: "2026-07-11", v: 74800.25 },   // +2 000
   { d: "2026-07-15", v: 78822.21 },   // +4 000 influx
-  { d: "2026-07-17", v: 14215.95 }    // all trips discharged — real reading, current anchor
+  { d: "2026-07-17", v: 14215.95 },   // all trips discharged — real reading
+  { d: "2026-07-24", v: 16215.95 },   // +2 000 weekly top-up
+  { d: "2026-07-27", v: 12959.87 }    // Rigel remainder discharged — real reading, current anchor
 ];
 
 // DISCHARGE LOG — trips paid from the reserve; the amount is what the reserve
@@ -57,9 +61,13 @@ const LOG = [
     ]
   },
   {
-    name: "Rigel", dates: "25 – 27 Jul 2026", total: 9042, per: 4521,
+    name: "Rigel", dates: "25 – 27 Jul 2026", total: 12309.32, per: 6154.66,
     items: [
-      { date: "12 Jun 2026", category: "berth", amount: 9042 }
+      { date: "12 Jun 2026", category: "berth",  amount: 9042 },
+      { date: "25 Jul 2026", category: "galley", amount: 1397.32 },
+      { date: "25 Jul 2026", category: "galley", amount:  600 },
+      { date: "25 Jul 2026", category: "aux",    amount: 1000 },
+      { date: "27 Jul 2026", category: "galley", amount:  270 }
     ]
   },
   {
