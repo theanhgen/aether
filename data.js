@@ -113,6 +113,23 @@ const fluxRow = f => {
 const dayRate     = RATE / 365;
 const anchorDate  = new Date(ANCHOR.atISO);
 const driftPerDay = ANCHOR.balance * dayRate;     // ≈ interest/day at the current balance
-// live estimate — recomputed on each call so the balance ticks up as interest accrues
-const liveNow = () => ANCHOR.balance * Math.pow(1 + dayRate, Math.max(0, (Date.now() - anchorDate.getTime()) / 86400000));
+// Scheduled Fridays between two instants — the standing +2 000 lands every Friday,
+// so the estimate credits them instead of drifting 2 000 further behind each week.
+// Steps on calendar midnights, not on offsets from the anchor's clock time — otherwise
+// an anchor taken at 21:35 would only credit a Friday top-up after 21:35 that Friday.
+const weeklyTopUps = (fromMs, toMs) => {
+  const DAY = 86400000, out = [], f = new Date(fromMs);
+  let t = new Date(f.getFullYear(), f.getMonth(), f.getDate() + 1).getTime();
+  for (; t <= toMs; t += DAY) if (new Date(t).getDay() === 5) out.push(t);
+  return out;
+};
+// live estimate — recomputed on each call so the balance ticks up as interest accrues,
+// plus each Friday top-up that has already landed, compounded for its remaining days
+const liveNow = () => {
+  const now = Date.now(), start = anchorDate.getTime();
+  const elapsed = Math.max(0, (now - start) / 86400000);
+  let v = ANCHOR.balance * Math.pow(1 + dayRate, elapsed);
+  for (const t of weeklyTopUps(start, now)) v += WEEKLY_IN * Math.pow(1 + dayRate, (now - t) / 86400000);
+  return v;
+};
 const shortDate = anchorDate.toLocaleDateString("en-GB", { day: "numeric", month: "short" });

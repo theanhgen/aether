@@ -45,14 +45,23 @@ function mountBalanceChart(root, windowDays) {
   // drifts with interest, so project it forward — otherwise the chart stops at the last
   // sync and reads as stale. The projected point is marked `est` so the axis label can
   // say "now" instead of pretending it's a reading.
+  // Each Friday crossed also gets the standing +2 000 top-up, so the projection keeps
+  // pace instead of falling 2 000 further behind every week. Fridays get their own point
+  // so the line steps up there rather than smearing the jump across the whole gap.
   {
     const last = all[all.length - 1];
     const n = new Date();
     const todayT = Date.UTC(n.getFullYear(), n.getMonth(), n.getDate());
-    if (todayT > last.t) {
-      const days = (todayT - last.t) / DAY;
-      all.push({ t: todayT, v: last.v * Math.pow(1 + dayRate, days), est: true });
+    const weekly = typeof WEEKLY_IN !== "undefined" ? WEEKLY_IN : 0;
+    let v = last.v;
+    for (let t = last.t + DAY; t <= todayT; t += DAY) {
+      v *= 1 + dayRate;
+      if (new Date(t).getUTCDay() === 5) {                  // Friday top-up landed
+        v += weekly;
+        if (t < todayT) all.push({ t, v, est: true });
+      }
     }
+    if (todayT > last.t) all.push({ t: todayT, v, est: true });
   }
   const tMax = all[all.length - 1].t;
   const full = !isFinite(windowDays);
