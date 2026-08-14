@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--
+  AETHER — share-card source. Not linked from any page; it exists only to render og.png.
+  The number is read live from data.js, so there is nothing to edit here: update data.js,
+  then re-render and commit both files.
+
+    cd <this folder>
+    "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+      --headless --disable-gpu --force-color-profile=srgb --hide-scrollbars \
+      --virtual-time-budget=2000 --window-size=1200,630 \
+      --screenshot=og.png "file://$PWD/og-card.html"
+
+  og.png is a static PNG: whatever it shows is frozen until the next render. Regenerate it
+  whenever the anchor moves, or the share preview will quietly show an old balance.
+-->
+<head>
+<meta charset="utf-8">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    width:1200px; height:630px; background:#fff;
+    color:oklch(0.148 0.004 228.8);
+    font:13.5px/1.5 ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+    position:relative;
+  }
+  .card{position:absolute; left:56px; top:198px}
+  .brand{display:flex; align-items:center; gap:16px}
+  .dot{width:34px; height:34px; border-radius:50%; background:oklch(0.723 0.219 149.579)}
+  .brand h1{margin:0; font-size:31px; font-weight:700; letter-spacing:.20em}
+  .label{margin-top:38px; font-size:20px; letter-spacing:.06em; color:oklch(0.56 0.021 213.5)}
+  .now{margin-top:8px; font-size:92px; font-weight:700; letter-spacing:-.03em; line-height:1;
+       font-variant-numeric:tabular-nums; font-feature-settings:"tnum"; display:flex; align-items:baseline}
+  .now .dec{color:oklch(0.72 0.014 214.4)}
+  .now .cur{font-size:27px; font-weight:500; letter-spacing:0; margin-left:22px;
+            color:oklch(0.56 0.021 213.5)}
+  .sub{margin-top:34px; font-size:20px; letter-spacing:.02em; color:oklch(0.56 0.021 213.5)}
+  .foot{position:absolute; left:56px; top:578px; font-size:19px; letter-spacing:.02em;
+        color:oklch(0.80 0.008 214.4)}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand"><span class="dot"></span><h1>AETHER</h1></div>
+    <div class="label">core charge</div>
+    <div class="now"><span id="int">—</span><span class="dec" id="dec"></span><span class="cur">AU</span></div>
+    <div class="sub">reserve · read-only node</div>
+  </div>
+  <div class="foot">resync ⟢ each cycle</div>
+
+<script src="data.js"></script>
+<script>
+  // same live estimate the pages show — snapshotted at render time
+  const parts = cz2(liveNow()).split(",");
+  document.getElementById("int").textContent = parts[0];
+  document.getElementById("dec").textContent = "," + parts[1];
+</script>
+</body>
+</html>
