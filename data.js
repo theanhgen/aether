@@ -2,8 +2,8 @@
 
 // Confirmed balance + when it was read off the app. Page estimates "now" from drift.
 const ANCHOR = {
-  balance: 12959.87,   // real app reading 27 Jul 21:35 — after the Rigel remainder was discharged
-  atISO: "2026-07-27T21:35:00+02:00"
+  balance: 16975.79,   // verified 11 Aug 15:38 — the exact sum that left and re-entered the reserve
+  atISO: "2026-08-11T15:38:00+02:00"
 };
 const RATE = 0.0275;       // 2.75 % p.a. net
 const WEEKLY_IN = 2000;    // top-up per week (2 × 1 000)
@@ -13,6 +13,9 @@ const WINDOW_DAYS = 90;    // balance chart: rolling window length
 // negative = efflux (out). Routine weekly top-ups between are omitted (they're
 // summarised by the influx stat); daily interest is the drift stat.
 const FLUX = [
+  { date: "14 Aug 2026", amount:  2000 },      // weekly top-up (2 × 1 000) — first sweep via the new feeder
+  { date: "11 Aug 2026", amount:  2000 },      // weekly top-up (2 × 1 000)
+  { date: "01 Aug 2026", amount:  2000 },      // weekly top-up (2 × 1 000)
   { date: "27 Jul 2026", amount: -3267.32 },   // Rigel — on-ground remainder discharged
   { date: "24 Jul 2026", amount:  2000 },      // weekly top-up (2 × 1 000)
   { date: "17 Jul 2026", amount:  2000 },      // weekly top-up (2 × 1 000)
@@ -46,7 +49,9 @@ const BALANCE = [
   { d: "2026-07-15", v: 78822.21 },   // +4 000 influx
   { d: "2026-07-17", v: 14215.95 },   // all trips discharged — real reading
   { d: "2026-07-24", v: 16215.95 },   // +2 000 weekly top-up
-  { d: "2026-07-27", v: 12959.87 }    // Rigel remainder discharged — real reading, current anchor
+  { d: "2026-07-27", v: 12959.87 },   // Rigel remainder discharged — real reading
+  { d: "2026-08-01", v: 14959.87 },   // +2 000 weekly top-up
+  { d: "2026-08-11", v: 16975.79 }    // +2 000 top-up + drift — verified reading, current anchor
 ];
 
 // DISCHARGE LOG — trips paid from the reserve; the amount is what the reserve
