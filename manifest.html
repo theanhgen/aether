@@ -78,8 +78,7 @@ document.getElementById("log").innerHTML = LOG.length
       </div>
       <div>
         <div class="amt tnum">${czMoney(t.total ?? 0)} AU</div>
-        <div class="per tnum">${czMoney(t.per ?? 0)} / unit</div>
-        ${t.days ? `<div class="per tnum">${cz2((t.per ?? 0) / t.days)} / unit·day</div>` : ""}
+        <div class="per tnum">${czMoney(t.per ?? 0)} / unit${t.days ? ` · ${cz2((t.per ?? 0) / t.days)} / day` : ""}</div>
       </div>`;
       return href
         ? `<a class="row rowlink" href="${href}">${inner}</a>`
