@@ -99,6 +99,9 @@ h2{font-size:12px; font-weight:600; letter-spacing:.1em; text-transform:uppercas
 .row .amt.out{color:var(--foreground)}
 a.row.rowlink{text-decoration:none; color:inherit; cursor:pointer; transition:background .12s ease}
 a.row.rowlink:hover{background:color-mix(in oklab, var(--muted) 55%, transparent)}
+.row .pend{display:inline-block; margin-left:8px; padding:1px 7px; border:1px solid var(--border);
+  border-radius:999px; background:var(--muted); color:var(--muted-foreground);
+  font-size:10px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; vertical-align:1px}
 .row .chev{color:var(--muted-foreground); font-weight:400; margin-left:4px; transition:color .12s ease}
 a.row.rowlink:hover .chev{color:var(--primary)}
 .row.catsub{border-top:1px solid var(--border)}

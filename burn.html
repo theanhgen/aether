@@ -59,7 +59,7 @@ if (!trip) {
 } else {
   document.getElementById("sub").textContent = trip.name.toLowerCase();
   document.getElementById("tname").textContent = trip.name;
-  document.getElementById("tdates").textContent = trip.dates;
+  document.getElementById("tdates").textContent = trip.dates + (trip.pending ? " · pending — not yet discharged from the reserve" : "");
 
   const CATS = ["thrust", "berth", "galley", "survey", "aux"];   // coded spend buckets
   const by = {};

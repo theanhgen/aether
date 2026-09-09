@@ -64,7 +64,8 @@ const BALANCE = [
 // (thrust | berth | galley | survey | aux). total should equal their sum.
 const LOG = [
   {
-    name: "Vega", dates: "5 – 8 Sep 2026", total: 9431.24, per: 4715.62,
+    // pending: the reserve has NOT paid this yet — settlement route still undecided.
+    name: "Vega", dates: "5 – 8 Sep 2026", total: 9431.24, per: 4715.62, days: 4, pending: true,
     items: [
       { date: "05 Sep 2026", category: "berth",  amount: 1300 },
       { date: "08 Sep 2026", category: "thrust", amount: 2202.70 },
@@ -73,13 +74,13 @@ const LOG = [
     ]
   },
   {
-    name: "Antares", dates: "17 Oct – 8 Nov 2026", total: 39682.21, per: 19841.11,
+    name: "Antares", dates: "17 Oct – 8 Nov 2026", total: 39682.21, per: 19841.11, days: 23,
     items: [
       { date: "16 Jul 2026", category: "thrust", amount: 39682.21 }
     ]
   },
   {
-    name: "Rigel", dates: "25 – 27 Jul 2026", total: 12309.32, per: 6154.66,
+    name: "Rigel", dates: "25 – 27 Jul 2026", total: 12309.32, per: 6154.66, days: 3,
     items: [
       { date: "12 Jun 2026", category: "berth",  amount: 9042 },
       { date: "25 Jul 2026", category: "galley", amount: 1397.32 },
@@ -89,13 +90,13 @@ const LOG = [
     ]
   },
   {
-    name: "Cargo", dates: "12 Jul 2026", total: 3800.62, per: 1900.31,
+    name: "Cargo", dates: "12 Jul 2026", total: 3800.62, per: 1900.31, days: 1,
     items: [
       { date: "12 Jul 2026", category: "aux", amount: 3800.62 }
     ]
   },
   {
-    name: "Altair", dates: "10 – 12 Jul 2026", total: 14093.73, per: 7046.87,
+    name: "Altair", dates: "10 – 12 Jul 2026", total: 14093.73, per: 7046.87, days: 3,
     items: [
       { date: "11 Jul 2026", category: "berth",  amount: 1570.57 },
       { date: "11 Jul 2026", category: "galley", amount: 7223.16 },
