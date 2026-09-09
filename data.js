@@ -13,6 +13,9 @@ const WINDOW_DAYS = 90;    // balance chart: rolling window length
 // negative = efflux (out). Routine weekly top-ups between are omitted (they're
 // summarised by the influx stat); daily interest is the drift stat.
 const FLUX = [
+  { date: "09 Sep 2026", amount:  2000 },      // weekly top-up — Friday 4 Sep was missed, swept today
+  { date: "28 Aug 2026", amount:  2000 },      // weekly top-up (2 × 1 000)
+  { date: "21 Aug 2026", amount:  2000 },      // weekly top-up (2 × 1 000)
   { date: "14 Aug 2026", amount:  2000 },      // weekly top-up (2 × 1 000) — first sweep via the new feeder
   { date: "11 Aug 2026", amount:  2000 },      // weekly top-up (2 × 1 000)
   { date: "01 Aug 2026", amount:  2000 },      // weekly top-up (2 × 1 000)
@@ -51,7 +54,8 @@ const BALANCE = [
   { d: "2026-07-24", v: 16215.95 },   // +2 000 weekly top-up
   { d: "2026-07-27", v: 12959.87 },   // Rigel remainder discharged — real reading
   { d: "2026-08-01", v: 14959.87 },   // +2 000 weekly top-up
-  { d: "2026-08-11", v: 16975.79 }    // +2 000 top-up + drift — verified reading, current anchor
+  { d: "2026-08-11", v: 16975.79 },   // +2 000 top-up + drift — verified reading
+  { d: "2026-09-09", v: 25021.46 }    // RECONSTRUCTED: anchor + 4 × 2 000 + 29 d drift; user read "~25k" off the app
 ];
 
 // DISCHARGE LOG — trips paid from the reserve; the amount is what the reserve
@@ -59,6 +63,15 @@ const BALANCE = [
 // items = the pocket discharges that funded the burn. category is a coded bucket
 // (thrust | berth | galley | survey | aux). total should equal their sum.
 const LOG = [
+  {
+    name: "Vega", dates: "5 – 8 Sep 2026", total: 9431.24, per: 4715.62,
+    items: [
+      { date: "05 Sep 2026", category: "berth",  amount: 1300 },
+      { date: "08 Sep 2026", category: "thrust", amount: 2202.70 },
+      { date: "08 Sep 2026", category: "galley", amount: 5559.54 },
+      { date: "04 Sep 2026", category: "aux",    amount:  369 }
+    ]
+  },
   {
     name: "Antares", dates: "17 Oct – 8 Nov 2026", total: 39682.21, per: 19841.11,
     items: [
