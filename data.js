@@ -2,17 +2,21 @@
 
 // Confirmed balance + when it was read off the app. Page estimates "now" from drift.
 const ANCHOR = {
-  balance: 16975.79,   // verified 11 Aug 15:38 — the exact sum that left and re-entered the reserve
-  atISO: "2026-08-11T15:38:00+02:00"
+  balance: 17605.46,   // verified 17 Sep 20:32 — remainder after the Vega discharge round-trip
+  atISO: "2026-09-17T20:32:00+02:00"
 };
 const RATE = 0.0275;       // 2.75 % p.a. net
-const WEEKLY_IN = 2000;    // top-up per week (2 × 1 000)
+const WEEKLY_IN = 2500;    // influx per week — ASYMMETRIC from Fri 18 Sep 2026:
+                           // 1 500 + 1 000 (was 2 × 1 000). Unit shares are no longer
+                           // equal by construction; ownership is tracked off-page.
 const WINDOW_DAYS = 90;    // balance chart: rolling window length
 
 // FLUX — notable capital movements, newest first. Positive = influx (in),
 // negative = efflux (out). Routine weekly top-ups between are omitted (they're
 // summarised by the influx stat); daily interest is the drift stat.
 const FLUX = [
+  { date: "17 Sep 2026", amount: -9431.24 },   // Vega — discharged in full (2 reimbursements)
+  { date: "11 Sep 2026", amount:  2000 },      // weekly top-up (2 × 1 000)
   { date: "09 Sep 2026", amount:  2000 },      // weekly top-up — Friday 4 Sep was missed, swept today
   { date: "28 Aug 2026", amount:  2000 },      // weekly top-up (2 × 1 000)
   { date: "21 Aug 2026", amount:  2000 },      // weekly top-up (2 × 1 000)
@@ -55,7 +59,8 @@ const BALANCE = [
   { d: "2026-07-27", v: 12959.87 },   // Rigel remainder discharged — real reading
   { d: "2026-08-01", v: 14959.87 },   // +2 000 weekly top-up
   { d: "2026-08-11", v: 16975.79 },   // +2 000 top-up + drift — verified reading
-  { d: "2026-09-09", v: 25021.46 }    // RECONSTRUCTED: anchor + 4 × 2 000 + 29 d drift; user read "~25k" off the app
+  { d: "2026-09-09", v: 25021.46 },   // RECONSTRUCTED: anchor + 4 × 2 000 + 29 d drift; user read "~25k" off the app
+  { d: "2026-09-17", v: 17605.46 }    // after the Vega discharge — real reading, 20:32
 ];
 
 // DISCHARGE LOG — trips paid from the reserve; the amount is what the reserve
@@ -64,8 +69,8 @@ const BALANCE = [
 // (thrust | berth | galley | survey | aux). total should equal their sum.
 const LOG = [
   {
-    // pending: the reserve has NOT paid this yet — settlement route still undecided.
-    name: "Vega", dates: "5 – 8 Sep 2026", total: 9431.24, per: 4715.62, days: 4, pending: true,
+    // discharged 17 Sep 2026 from the reserve, as two reimbursements: 6 246,24 + 3 185,00.
+    name: "Vega", dates: "5 – 8 Sep 2026", total: 9431.24, per: 4715.62, days: 4,
     items: [
       { date: "05 Sep 2026", category: "berth",  amount: 1300 },
       { date: "08 Sep 2026", category: "thrust", amount: 2202.70 },

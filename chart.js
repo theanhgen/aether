@@ -45,8 +45,8 @@ function mountBalanceChart(root, windowDays) {
   // drifts with interest, so project it forward — otherwise the chart stops at the last
   // sync and reads as stale. The projected point is marked `est` so the axis label can
   // say "now" instead of pretending it's a reading.
-  // Each Friday crossed also gets the standing +2 000 top-up, so the projection keeps
-  // pace instead of falling 2 000 further behind every week. Fridays get their own point
+  // Each Friday crossed also gets the standing WEEKLY_IN top-up, so the projection keeps
+  // pace instead of falling a week's influx behind every week. Fridays get their own point
   // so the line steps up there rather than smearing the jump across the whole gap.
   {
     const last = all[all.length - 1];
