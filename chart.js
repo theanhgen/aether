@@ -52,12 +52,15 @@ function mountBalanceChart(root, windowDays) {
     const last = all[all.length - 1];
     const n = new Date();
     const todayT = Date.UTC(n.getFullYear(), n.getMonth(), n.getDate());
-    const weekly = typeof WEEKLY_IN !== "undefined" ? WEEKLY_IN : 0;
+    // per-Friday amount, so a schedule change mid-projection is honoured
+    const weeklyAt = typeof weeklyInAt === "function"
+      ? weeklyInAt
+      : () => (typeof WEEKLY_IN !== "undefined" ? WEEKLY_IN : 0);
     let v = last.v;
     for (let t = last.t + DAY; t <= todayT; t += DAY) {
       v *= 1 + dayRate;
       if (new Date(t).getUTCDay() === 5) {                  // Friday top-up landed
-        v += weekly;
+        v += weeklyAt(t);
         if (t < todayT) all.push({ t, v, est: true });
       }
     }

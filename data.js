@@ -6,9 +6,23 @@ const ANCHOR = {
   atISO: "2026-09-17T20:32:00+02:00"
 };
 const RATE = 0.0275;       // 2.75 % p.a. net
-const WEEKLY_IN = 2500;    // influx per week — ASYMMETRIC from Fri 18 Sep 2026:
-                           // 1 500 + 1 000 (was 2 × 1 000). Unit shares are no longer
-                           // equal by construction; ownership is tracked off-page.
+// Weekly influx is DATED, not a single constant: the Friday amount changed on
+// 18 Sep 2026 (1 500 + 1 000, was 2 × 1 000), and the two units no longer put in
+// the same share — so unit shares are not equal by construction any more and
+// ownership is tracked off-page. Each entry = "from this Friday on, the top-up is X".
+// Keep it sorted oldest → newest.
+const WEEKLY_SCHEDULE = [
+  { from: "2026-03-14", amount: 2000 },
+  { from: "2026-09-18", amount: 2500 }
+];
+// Amount in force at instant t — used per-Friday so a re-anchor to any earlier
+// date still credits the historically correct figure.
+const weeklyInAt = t => {
+  let a = WEEKLY_SCHEDULE[0].amount;
+  for (const w of WEEKLY_SCHEDULE) { if (Date.parse(w.from + "T00:00:00Z") <= t) a = w.amount; else break; }
+  return a;
+};
+const WEEKLY_IN = WEEKLY_SCHEDULE[WEEKLY_SCHEDULE.length - 1].amount;  // current rate, for labels
 const WINDOW_DAYS = 90;    // balance chart: rolling window length
 
 // FLUX — notable capital movements, newest first. Positive = influx (in),
@@ -153,7 +167,7 @@ const liveNow = () => {
   const now = Date.now(), start = anchorDate.getTime();
   const elapsed = Math.max(0, (now - start) / 86400000);
   let v = ANCHOR.balance * Math.pow(1 + dayRate, elapsed);
-  for (const t of weeklyTopUps(start, now)) v += WEEKLY_IN * Math.pow(1 + dayRate, (now - t) / 86400000);
+  for (const t of weeklyTopUps(start, now)) v += weeklyInAt(t) * Math.pow(1 + dayRate, (now - t) / 86400000);
   return v;
 };
 const shortDate = anchorDate.toLocaleDateString("en-GB", { day: "numeric", month: "short" });
