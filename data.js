@@ -17,9 +17,20 @@ const WEEKLY_SCHEDULE = [
 ];
 // Amount in force at instant t — used per-Friday so a re-anchor to any earlier
 // date still credits the historically correct figure.
+//
+// Compared on the LOCAL calendar date, not as a UTC instant. The two callers
+// build their Fridays differently — liveNow() steps on local midnights, the
+// chart on UTC midnights — so a UTC comparison put the same Friday on opposite
+// sides of a schedule change and the headline and the chart disagreed by the
+// step size (500 AU on 18 Sep 2026). Both agree on what calendar day it is.
+const localDateKey = t => {
+  const d = new Date(t), p = n => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
+};
 const weeklyInAt = t => {
+  const key = localDateKey(t);              // ISO dates compare correctly as strings
   let a = WEEKLY_SCHEDULE[0].amount;
-  for (const w of WEEKLY_SCHEDULE) { if (Date.parse(w.from + "T00:00:00Z") <= t) a = w.amount; else break; }
+  for (const w of WEEKLY_SCHEDULE) { if (w.from <= key) a = w.amount; else break; }
   return a;
 };
 const WEEKLY_IN = WEEKLY_SCHEDULE[WEEKLY_SCHEDULE.length - 1].amount;  // current rate, for labels
