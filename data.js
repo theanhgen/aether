@@ -7,13 +7,15 @@ const ANCHOR = {
 };
 const RATE = 0.0275;       // 2.75 % p.a. net
 // Weekly influx is DATED, not a single constant: the Friday amount changed on
-// 18 Sep 2026 (1 500 + 1 000, was 2 × 1 000), and the two units no longer put in
+// 18 Sep 2026 (1 500 + 1 000, was 2 × 1 000) and again on 4 Dec 2026
+// (6 250 + 4 250), and the two units no longer put in
 // the same share — so unit shares are not equal by construction any more and
 // ownership is tracked off-page. Each entry = "from this Friday on, the top-up is X".
 // Keep it sorted oldest → newest.
 const WEEKLY_SCHEDULE = [
   { from: "2026-03-14", amount: 2000 },
-  { from: "2026-09-18", amount: 2500 }
+  { from: "2026-09-18", amount: 2500 },
+  { from: "2026-12-04", amount: 10500 }
 ];
 // Amount in force at instant t — used per-Friday so a re-anchor to any earlier
 // date still credits the historically correct figure.
@@ -33,7 +35,7 @@ const weeklyInAt = t => {
   for (const w of WEEKLY_SCHEDULE) { if (w.from <= key) a = w.amount; else break; }
   return a;
 };
-const WEEKLY_IN = WEEKLY_SCHEDULE[WEEKLY_SCHEDULE.length - 1].amount;  // current rate, for labels
+const WEEKLY_IN = weeklyInAt(Date.now());  // rate in force today, for labels (a future entry only shows once it starts)
 const WINDOW_DAYS = 90;    // balance chart: rolling window length
 
 // FLUX — notable capital movements, newest first. Positive = influx (in),
