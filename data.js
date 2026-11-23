@@ -2,8 +2,8 @@
 
 // Confirmed balance + when it was read off the app. Page estimates "now" from drift.
 const ANCHOR = {
-  balance: 17605.46,   // verified 17 Sep 20:32 — remainder after the Vega discharge round-trip
-  atISO: "2026-09-17T20:32:00+02:00"
+  balance: 27929.94,   // 23 Nov: app reading 40 256,93 − 12 326,99 reimbursement; not app-confirmed after it
+  atISO: "2026-11-23T18:00:00+01:00"
 };
 const RATE = 0.0275;       // 2.75 % p.a. net
 // Weekly influx is DATED, not a single constant: the Friday amount changed on
@@ -42,6 +42,7 @@ const WINDOW_DAYS = 90;    // balance chart: rolling window length
 // negative = efflux (out). Routine weekly top-ups between are omitted (they're
 // summarised by the influx stat); daily interest is the drift stat.
 const FLUX = [
+  { date: "23 Nov 2026", amount: -12326.99 },  // shared costs reimbursed (one transfer)
   { date: "17 Sep 2026", amount: -9431.24 },   // Vega — discharged in full (2 reimbursements)
   { date: "11 Sep 2026", amount:  2000 },      // weekly top-up (2 × 1 000)
   { date: "09 Sep 2026", amount:  2000 },      // weekly top-up — Friday 4 Sep was missed, swept today
@@ -87,7 +88,8 @@ const BALANCE = [
   { d: "2026-08-01", v: 14959.87 },   // +2 000 weekly top-up
   { d: "2026-08-11", v: 16975.79 },   // +2 000 top-up + drift — verified reading
   { d: "2026-09-09", v: 25021.46 },   // RECONSTRUCTED: anchor + 4 × 2 000 + 29 d drift; user read "~25k" off the app
-  { d: "2026-09-17", v: 17605.46 }    // after the Vega discharge — real reading, 20:32
+  { d: "2026-09-17", v: 17605.46 },   // after the Vega discharge — real reading, 20:32
+  { d: "2026-11-23", v: 27929.94 }    // app reading 40 256,93, then −12 326,99 out (estimate)
 ];
 
 // DISCHARGE LOG — trips paid from the reserve; the amount is what the reserve
