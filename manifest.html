@@ -31,20 +31,20 @@
     <div class="updated" id="updated"></div>
   </header>
 
-  <div class="kpis">
-    <div class="card kpi"><div class="k">influx / wk</div><div class="v tnum" id="kInflux">—</div></div>
-    <div class="card kpi"><div class="k">drift / day</div><div class="v tnum" id="kDrift">—</div></div>
-    <div class="card kpi"><div class="k">rate</div><div class="v tnum" id="kRate">—</div></div>
-  </div>
+  <section id="kpis"></section>
 
-  <div class="card chart-card" id="balchart" style="margin-top:4px"></div>
+  <section class="gp-wrap" id="balchart"></section>
 
-  <h2 style="margin-top:28px">flux</h2>
-  <div class="card log" id="flux"></div>
-  <a class="navlink" href="flux.html" style="margin-top:10px">all flux ⟢</a>
+  <section>
+    <h2><span class="mk">≡</span>flux · latest</h2>
+    <div id="flux"></div>
+    <a class="navlink" href="flux.html" style="margin-top:8px">all flux ⟢</a>
+  </section>
 
-  <h2 style="margin-top:28px">discharge log</h2>
-  <div class="card log" id="log"></div>
+  <section>
+    <h2><span class="mk">≡</span>discharge log</h2>
+    <div id="log"></div>
+  </section>
 
   <a class="navlink" href="index.html" style="margin-top:20px">⟢ core charge</a>
 
@@ -52,39 +52,31 @@
 </div>
 
 <script src="data.js"></script>
+<script src="ui.js"></script>
 <script src="chart.js"></script>
 <script>
 document.getElementById("updated").textContent = "sync ⟢ " + shortDate;
 
-// KPIs — derived from data.js (single source of truth)
-document.getElementById("kInflux").textContent = "+" + cz(WEEKLY_IN) + " AU";
-document.getElementById("kDrift").textContent  = "+" + cz2(driftPerDay) + " AU";
-document.getElementById("kRate").textContent   = (RATE * 100).toFixed(2).replace(".", ",") + "%";
+// vitals — same grid as the core page, derived from data.js
+document.getElementById("kpis").innerHTML = vitalsGrid(vitalsItems(), 4);
 
-// balance chart — fixed 90-day window (toggle lives on flux.html only)
+// balance trace — fixed 90-day window (toggle lives on flux.html only)
 mountBalanceChart(document.getElementById("balchart"), WINDOW_DAYS);
 
-// flux — latest 3 movements only (interest excluded); full list on flux.html
-document.getElementById("flux").innerHTML = FLUX.slice(0, 3).map(fluxRow).join("");
+// flux — latest 3 movements only (interest excluded); full receipt on flux.html
+document.getElementById("flux").innerHTML = fluxReceipt(FLUX.slice(0, 3), false);
 
-// discharge log — pot-funded trips only (empty until one exists)
-document.getElementById("log").innerHTML = LOG.length
-  ? LOG.map(t => {
-      const href = t.items && t.items.length ? `burn.html#${t.name.toLowerCase()}` : null;
-      const inner = `
-      <div>
-        <div class="name">${t.name}${t.pending ? ' <span class="pend">pending</span>' : ''}${href ? ' <span class="chev">→</span>' : ''}</div>
-        <div class="dates">${t.dates}</div>
-      </div>
-      <div>
-        <div class="amt tnum">${czMoney(t.total ?? 0)} AU</div>
-        ${t.days ? `<div class="per tnum">${cz2((t.per ?? 0) / t.days)} / unit·day</div>` : ""}
-      </div>`;
-      return href
-        ? `<a class="row rowlink" href="${href}">${inner}</a>`
-        : `<div class="row">${inner}</div>`;
-    }).join("")
-  : `<div class="row"><div class="dates">— nothing discharged yet —</div></div>`;
+// discharge log — pot-funded trips as one plate
+// drawn at the diagram's real pixel width so its labels stay readable
+const logEl = document.getElementById("log");
+function drawPlate() {
+  logEl.innerHTML = plateHTML();
+  const sv = logEl.querySelector(".plate svg");
+  if (sv) logEl.innerHTML = plateHTML(sv.getBoundingClientRect().width);
+}
+drawPlate();
+let logW = logEl.clientWidth;
+new ResizeObserver(() => { if (Math.abs(logEl.clientWidth - logW) > 2) { logW = logEl.clientWidth; drawPlate(); } }).observe(logEl);
 </script>
 </body>
 </html>

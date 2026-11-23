@@ -31,38 +31,47 @@
     <div class="updated" id="updated"></div>
   </header>
 
-  <section class="card hero">
-    <div class="hero-top">
-      <span class="label">core charge</span>
-    </div>
-    <div class="now tnum"><span id="now">—</span><span class="cur">AU</span></div>
-    <div class="accrued" id="accrued"></div>
-    <dl class="vitals">
-      <div><dt>last sync</dt><dd class="tnum"><b id="anchor"></b> AU</dd></div>
-      <div><dt>influx</dt><dd class="tnum" id="vInflux"></dd></div>
-      <div><dt>drift</dt><dd class="tnum" id="vDrift"></dd></div>
-      <div><dt>rate</dt><dd class="tnum" id="vRate"></dd></div>
-    </dl>
-  </section>
-
-  <a class="navlink" href="manifest.html">manifest ⟢</a>
+  <main class="core">
+    <section class="core-l">
+      <div class="vlab"><span class="mk">≡</span>core charge</div>
+      <div class="now tnum"><span id="now">—</span><span class="cur">AU</span></div>
+      <div class="accrued" id="accrued"></div>
+      <div id="vitals"></div>
+      <a class="navlink" href="manifest.html" style="margin-top:14px">manifest ⟢</a>
+    </section>
+    <figure class="rings" id="rings"></figure>
+  </main>
 </div>
 
 <script src="data.js"></script>
+<script src="ui.js"></script>
 <script>
+document.getElementById("updated").textContent = "sync ⟢ " + shortDate;
+document.getElementById("vitals").innerHTML = vitalsGrid(vitalsItems(), 2);
+
+// rings gauge — outer: total discharged to date (Σ LOG), inner: core charge (live).
+// radius is linear in the amount.
+const rings = document.getElementById("rings");
+function drawRings() {
+  rings.innerHTML = ringsSVG(
+    { label: "discharged to date", amount: totalDischarged() },
+    { label: "core charge", amount: liveNow() },
+    rings.clientWidth
+  ) + '<figcaption>radius ∝ amount · ' + LOG.length + ' burns</figcaption>';
+}
+drawRings();
+let ringsW = rings.clientWidth;
+new ResizeObserver(() => { if (Math.abs(rings.clientWidth - ringsW) > 2) { ringsW = rings.clientWidth; drawRings(); } }).observe(rings);
+
 // live tick — balance grows as interest accrues; accrued line shows interest since sync
 function tick(){
   const n = liveNow();
   document.getElementById("now").textContent = cz2(n);
   document.getElementById("accrued").textContent = "+" + cz2(n - ANCHOR.balance) + " since sync";
+  const r = rings.querySelector('[data-ring="b"]'); if (r) r.textContent = cz2(n) + " AU";
 }
 tick();
 setInterval(tick, 1000);
-document.getElementById("anchor").textContent = cz2(ANCHOR.balance);
-document.getElementById("updated").textContent = "sync ⟢ " + shortDate;
-document.getElementById("vInflux").textContent = "+" + cz(WEEKLY_IN) + " / wk";
-document.getElementById("vDrift").textContent  = "+" + cz2(driftPerDay) + " / day";
-document.getElementById("vRate").textContent   = (RATE * 100).toFixed(2).replace(".", ",") + "%";
 </script>
 </body>
 </html>

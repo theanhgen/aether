@@ -35,11 +35,18 @@
     <button data-w="90">90d</button>
     <button data-w="all" class="on">all</button>
   </div>
-  <div class="card chart-card" id="fchart" style="margin-bottom:26px"></div>
+  <section class="gp-wrap" id="fchart"></section>
 
-  <h2>all movements</h2>
-  <div class="card log" id="flux"></div>
-  <div class="chart-foot-sub" style="margin-top:10px">influx &amp; efflux · drift shown daily on the chart</div>
+  <section>
+    <h2><span class="mk">≡</span>all movements</h2>
+    <div class="rc-layout">
+      <div class="rc-meta">
+        <div class="rc-kv" id="meta"></div>
+        <div class="rc-note">this document is a record<br>of every notable movement<br>of the reserve.<br>drift is shown daily on the trace.</div>
+      </div>
+      <div id="flux"></div>
+    </div>
+  </section>
 
   <a class="navlink" href="manifest.html" style="margin-top:20px">⟢ manifest</a>
 
@@ -47,12 +54,21 @@
 </div>
 
 <script src="data.js"></script>
+<script src="ui.js"></script>
 <script src="chart.js"></script>
 <script>
 document.getElementById("updated").textContent = "sync ⟢ " + shortDate;
-document.getElementById("flux").innerHTML = FLUX.map(fluxRow).join("");
+document.getElementById("flux").innerHTML = fluxReceipt(FLUX, true);
+const first = FLUX[FLUX.length - 1], last = FLUX[0];
+document.getElementById("meta").innerHTML = [
+  ["node", "AETHER"],
+  ["period", first.date + " – " + last.date],
+  ["entries", FLUX.length],
+  ["last sync", anchorDate.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })],
+  ["core charge", cz2(ANCHOR.balance) + " AU"]
+].map(r => '<div><span>' + r[0] + '</span><span class="tnum">' + r[1] + '</span></div>').join("");
 
-// balance chart with a 90d / full-history toggle (only on this page)
+// balance trace with a 90d / full-history toggle (only on this page)
 const chartRoot = document.getElementById("fchart");
 mountBalanceChart(chartRoot, Infinity);   // all movements page defaults to full history
 document.querySelectorAll("#btoggle button").forEach(b => {

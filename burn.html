@@ -20,7 +20,7 @@
 <link rel="stylesheet" href="aether.css">
 </head>
 <body>
-<div class="wrap">
+<div class="wrap wide">
   <header>
     <a class="brand" href="manifest.html">
       <div>
@@ -31,64 +31,50 @@
     <div class="updated" id="updated"></div>
   </header>
 
-  <div class="chart-head" style="padding:0 2px 8px">
-    <div>
-      <div class="chart-title" id="tname">—</div>
-      <div class="chart-desc" id="tdates"></div>
-    </div>
-  </div>
+  <section>
+    <h2><span class="mk">≡</span>burn profiles · thrust / berth / galley / survey / aux</h2>
+    <div id="panels"></div>
+  </section>
 
-  <div id="cats"></div>
-  <div class="card triptotal" id="ttotal"></div>
+  <section class="burn-items" id="items"></section>
 
   <a class="navlink" href="manifest.html" style="margin-top:20px">⟢ manifest</a>
   <footer>AETHER · read-only node · resync ⟢ each cycle</footer>
 </div>
 
 <script src="data.js"></script>
+<script src="ui.js"></script>
 <script>
 document.getElementById("updated").textContent = "sync ⟢ " + shortDate;
 
-const id = decodeURIComponent(location.hash.slice(1)).toLowerCase();
-const trip = (typeof LOG !== "undefined" ? LOG : [])
-  .find(t => t.name.toLowerCase() === id && Array.isArray(t.items) && t.items.length);
+function render(scroll) {
+  const id = decodeURIComponent(location.hash.slice(1)).toLowerCase();
+  const trip = tripsChrono().find(t => t.slug === id);
+  document.getElementById("sub").textContent = trip ? trip.slug : "burn";
+  document.getElementById("panels").innerHTML = polarPanelsHTML(trip ? trip.slug : null);
 
-if (!trip) {
-  document.getElementById("tname").textContent = "not found";
-  document.getElementById("tdates").textContent = "no detail for this entry — use the link below";
-} else {
-  document.getElementById("sub").textContent = trip.name.toLowerCase();
-  document.getElementById("tname").textContent = trip.name;
-  document.getElementById("tdates").textContent = trip.dates + (trip.pending ? " · pending — not yet discharged from the reserve" : "");
-
-  const CATS = ["thrust", "berth", "galley", "survey", "aux"];   // coded spend buckets
-  const by = {};
-  trip.items.forEach(it => (by[it.category || "aux"] ??= []).push(it));
-  // known categories in order, then any unknown ones (never silently drop an item)
-  const order = [...CATS.filter(c => by[c]), ...Object.keys(by).filter(c => !CATS.includes(c))];
-
-  document.getElementById("cats").innerHTML = order.map(c => {
-    const sub = by[c].reduce((s, it) => s + it.amount, 0);
-    const rows = by[c].map(it => `
-      <div class="row">
-        <div><div class="name">${it.date}</div></div>
-        <div class="amt tnum out">−${czMoney(it.amount)} AU</div>
-      </div>`).join("");
-    return `<h2 style="margin-top:22px">${c}</h2>
-      <div class="card log">${rows}
-        <div class="row catsub"><div class="name">subtotal</div><div class="amt tnum">−${czMoney(sub)} AU</div></div>
-      </div>`;
-  }).join("");
-
-  document.getElementById("ttotal").innerHTML = `
-    <div class="row" style="border:0; padding:0">
-      <div class="name">total discharged</div>
-      <div>
-        <div class="amt tnum">−${czMoney(trip.total ?? 0)} AU</div>
-        <div class="per tnum">${czMoney(trip.per ?? 0)} / unit</div>
-      </div>
-    </div>`;
+  // selected burn — its discharges as a receipt
+  const box = document.getElementById("items");
+  if (!trip) {
+    box.innerHTML = id
+      ? '<h2><span class="mk">≡</span>not found</h2><div class="chart-desc">no burn called “' + _esc(id) + '” — pick a panel</div>'
+      : '<div class="chart-desc">select a panel ⟢ its discharges</div>';
+    return;
+  }
+  const items = (trip.items || []).slice().sort((a, b) => parseDay(a.date) - parseDay(b.date));
+  const pd = perUnitDay(trip);
+  box.innerHTML = '<h2><span class="mk">≡</span>' + _esc(trip.no + " · " + trip.name) + ' · discharges</h2>'
+    + receiptHTML(["date", "bucket", "amount AU"],
+        items.map(it => [it.date, it.category || "aux", "−" + cz2(it.amount)]),
+        [["total discharged", "−" + cz2(trip.total ?? 0) + " AU", "net"],
+         ["per unit", cz2(trip.per ?? 0) + " AU"],
+         ...(pd == null ? [] : [["per unit·day", cz2(pd) + " AU"]])]);
+  if (scroll) document.getElementById(trip.slug).scrollIntoView({ block: "nearest", inline: "start" });
 }
+// local date parser for item dates ("05 Sep 2026")
+function parseDay(s) { const m = String(s).match(/(\d{1,2})\s+([A-Za-z]{3})\s+(\d{4})/); return m ? Date.UTC(+m[3], _UI_MON[m[2].toLowerCase()], +m[1]) : 0; }
+render(true);
+window.addEventListener("hashchange", () => render(false));
 </script>
 </body>
 </html>
