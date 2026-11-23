@@ -2,8 +2,8 @@
 
 // Confirmed balance + when it was read off the app. Page estimates "now" from drift.
 const ANCHOR = {
-  balance: 27929.94,   // 23 Nov: app reading 40 256,93 − 12 326,99 reimbursement; not app-confirmed after it
-  atISO: "2026-11-23T18:00:00+01:00"
+  balance: 30429.94,   // verified 23 Nov 21:37 — app reading after the reimbursement
+  atISO: "2026-11-23T21:37:00+01:00"
 };
 const RATE = 0.0275;       // 2.75 % p.a. net
 // Weekly influx is DATED, not a single constant: the Friday amount changed on
@@ -89,7 +89,7 @@ const BALANCE = [
   { d: "2026-08-11", v: 16975.79 },   // +2 000 top-up + drift — verified reading
   { d: "2026-09-09", v: 25021.46 },   // RECONSTRUCTED: anchor + 4 × 2 000 + 29 d drift; user read "~25k" off the app
   { d: "2026-09-17", v: 17605.46 },   // after the Vega discharge — real reading, 20:32
-  { d: "2026-11-23", v: 27929.94 }    // app reading 40 256,93, then −12 326,99 out (estimate)
+  { d: "2026-11-23", v: 30429.94 }    // real reading, 21:37, after the −12 326,99 reimbursement
 ];
 
 // DISCHARGE LOG — trips paid from the reserve; the amount is what the reserve
