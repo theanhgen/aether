@@ -39,12 +39,12 @@ function drawBalanceChart(root) {
   }
   root.innerHTML = `
     <div class="gp-head">
-      <div><div class="chart-title">≡ balance</div><div class="chart-desc"></div></div>
+      <div><div class="chart-title"><span class="mk" aria-hidden="true"></span>balance</div><div class="chart-desc"></div></div>
       <div class="chart-cur"></div>
     </div>
     <div class="gp-body"><svg class="gp"></svg></div>
     <div class="gp-key"></div>
-    <div class="gp-foot"><span class="gp-foot-main"></span><span>○ real reading · ■ efflux · + influx · gaps interpolated</span></div>`;
+    <div class="gp-foot"><span class="gp-foot-main"></span><span>○ real reading · <i class="sq" aria-hidden="true"></i> efflux · + influx · gaps interpolated</span></div>`;
   const svg = root.querySelector("svg.gp");
 
   // ---- series (unchanged logic: real readings, projected to today) ----
@@ -174,7 +174,7 @@ function drawBalanceChart(root) {
   });
 
   // ---- boxes: overlap-aware placement ----
-  const CW = 6.02, LH = 12.5;
+  const CW = 6.06, LH = 13.5, TCW = 8 * 0.606 + 0.5, TAGW = 4 * TCW + 8;   // Paper Mono advance 0.606em; tags at 8px
   const placed = [];
   const hits = (b, m = 3) => placed.some(q => b.x < q.x + q.w + m && q.x < b.x + b.w + m && b.y < q.y + q.h + m && q.y < b.y + b.h + m);
   const inPlot = b => b.x >= x0 + 3 && b.x + b.w <= x1 - 3 && b.y >= y0 + 3 && b.y + b.h <= y1 - 3;
@@ -186,14 +186,18 @@ function drawBalanceChart(root) {
   const fmt = _dm;
   const endsToday = all[all.length - 1].est;
   const tl = [["BALANCE TRACE", "ttl"], ["from: " + fmt(tMin), ""], ["to  : " + (endsToday ? "NOW" : fmt(tMax)), ""]];
-  const sl = [["STATUS:", ""], [status, "big"], ["sync " + shortDate.toUpperCase() + " · " + since + "d ago", ""]];
+  const sl = [["STATUS", "tag"], [status, "big"], ["sync " + shortDate.toUpperCase() + " · " + since + "d ago", ""]];
   const gW = Math.max(150, 21 * CW + 14), tH = 3 * LH + 10, sH = 12 + 26 + 14 + 10, gH = tH + 8 + sH;
   const corners = [[x0 + 14, y0 + 14], [x1 - 14 - gW, y0 + 14], [x0 + 14, y1 - 14 - gH], [x1 - 14 - gW, y1 - 14 - gH]];
   const [gx, gy] = corners.map(c => [c, traceIn({ x: c[0], y: c[1], w: gW, h: gH })]).sort((a, b) => a[1] - b[1])[0][0];
   let boxes = "";
   const boxText = (bx, by, lines) => {
     let yy = by + 4, s = "";
-    lines.forEach(([txt, cls]) => { yy += cls === "big" ? 24 : LH; s += `<text x="${bx + 7}" y="${yy.toFixed(1)}" class="${cls}">${txt}</text>`; });
+    lines.forEach(([txt, cls]) => {
+      yy += cls === "big" ? 24 : LH;
+      if (cls === "tag") { const tw = txt.length * TCW + 8; s += `<rect class="tg" x="${bx + 7}" y="${(yy - 8.5).toFixed(1)}" width="${tw.toFixed(1)}" height="11"/><text x="${bx + 11}" y="${(yy - 0.5).toFixed(1)}" class="tgt">${txt}</text>`; }
+      else s += `<text x="${bx + 7}" y="${yy.toFixed(1)}" class="${cls}">${txt}</text>`;
+    });
     return s;
   };
   boxes += `<rect class="box" x="${gx}" y="${gy}" width="${gW}" height="${tH}" rx="3"/>` + boxText(gx, gy, tl);
@@ -225,9 +229,9 @@ function drawBalanceChart(root) {
   const step = narrow ? 6 : 8;
   for (const m of cands) {
     const lines = [[fmt(m.t), "d"]];
-    if (m.out) lines.push(["OUT " + "−" + cz2(Math.abs(m.out)), ""]);
-    if (m.read) lines.push(["READ " + cz2(m.read), ""]);
-    const w = Math.max(...lines.map(l => l[0].length)) * CW + 14, h = lines.length * LH + 8;
+    if (m.out) lines.push(["−" + cz2(Math.abs(m.out)), "OUT"]);
+    if (m.read) lines.push([cz2(m.read), "READ"]);
+    const w = Math.max(...lines.map(l => l[0].length * CW + (l[1] === "d" ? 0 : TAGW + 5))) + 14, h = lines.length * LH + 8;
     const ax = X(m.t), ay = m.read ? Y(m.read) : Y(valueAt(m.t));
     let best = null;
     for (let bx = x0 + 4; bx + w <= x1 - 4; bx += step) {
@@ -251,7 +255,13 @@ function drawBalanceChart(root) {
     const b = best.b; placed.push(b); segs.push([[ax, ay], [best.cx, best.cy]]);
     leads.push(`<line class="lead" x1="${ax.toFixed(1)}" y1="${ay.toFixed(1)}" x2="${best.cx.toFixed(1)}" y2="${best.cy.toFixed(1)}"/>`);
     callouts += `<rect class="box" x="${b.x.toFixed(1)}" y="${b.y.toFixed(1)}" width="${w.toFixed(1)}" height="${h}" rx="2"/>`
-      + lines.map((l, i) => `<text x="${(b.x + 7).toFixed(1)}" y="${(b.y + 4 + LH * (i + 1) - 2).toFixed(1)}"${i === 0 ? ' style="font-size:9px;opacity:.7"' : ""}>${l[0]}</text>`).join("");
+      + lines.map((l, i) => {
+        const ty = b.y + 4 + LH * (i + 1) - 2;
+        if (i === 0) return `<text x="${(b.x + 7).toFixed(1)}" y="${ty.toFixed(1)}" style="font-size:9px;opacity:.7">${l[0]}</text>`;
+        return `<rect class="tg" x="${(b.x + 7).toFixed(1)}" y="${(ty - 8.5).toFixed(1)}" width="${TAGW.toFixed(1)}" height="11"/>`
+          + `<text class="tgt" x="${(b.x + 7 + TAGW / 2).toFixed(1)}" y="${(ty - 0.5).toFixed(1)}" text-anchor="middle">${l[1]}</text>`
+          + `<text x="${(b.x + 7 + TAGW + 5).toFixed(1)}" y="${ty.toFixed(1)}">${l[0]}</text>`;
+      }).join("");
   }
   // fallback (narrow screens): numbered boxed tag on the point, full values in the key below
   tags.sort((a, b) => a.m.t - b.m.t).forEach((g, i) => {
@@ -262,7 +272,7 @@ function drawBalanceChart(root) {
     placed.push(b);
     callouts += `<rect class="box" x="${b.x.toFixed(1)}" y="${b.y.toFixed(1)}" width="${w}" height="${h}" rx="2"/>`
       + `<text x="${(b.x + 4).toFixed(1)}" y="${(b.y + 10).toFixed(1)}" style="font-size:9px">${n}</text>`;
-    key.push(`<span><b>[${n}]</b> ${g.lines.map(l => l[0]).join(" · ")}</span>`);
+    key.push(`<span><b>[${n}]</b> ${g.lines.map(l => (l[1] && l[1] !== "d" ? l[1] + " " : "") + l[0]).join(" · ")}</span>`);
   });
   callouts = leads.join("") + callouts;
   const keyEl = root.querySelector(".gp-key");
@@ -278,12 +288,12 @@ function drawBalanceChart(root) {
   root.querySelector(".chart-desc").textContent = (full ? "full · " : "last " + windowDays + "d · ")
     + _fmtDay(tMin, { day: "numeric", month: "short" }) + " – " + (endsToday ? "now" : _fmtDay(tMax, { day: "numeric", month: "short" }));
   if (root._curTick) clearInterval(root._curTick);
-  const setCur = () => { const el = root.querySelector(".chart-cur"); if (el) el.innerHTML = cz2(liveNow()) + ' <span>AU</span>'; };
+  const setCur = () => { const el = root.querySelector(".chart-cur"); if (el) el.innerHTML = '<span class="fig">' + cz2(liveNow()) + '</span> <span>AU</span>'; };
   setCur();
   root._curTick = setInterval(setCur, 1000);
   const delta = wp[wp.length - 1].v - wp[0].v;
   const inSum = dayEvents.reduce((s, e) => s + e.in, 0), outSum = dayEvents.reduce((s, e) => s + e.out, 0);
-  root.querySelector(".gp-foot-main").innerHTML = `<b>${delta >= 0 ? "+" : "−"}${cz(Math.abs(delta))} AU</b> since ${_fmtDay(tMin, { day: "numeric", month: "short" })} · in +${cz(inSum)} · out ${outSum ? "−" + cz(Math.abs(outSum)) : "0"}`;
+  root.querySelector(".gp-foot-main").innerHTML = `<b>${delta >= 0 ? "+" : "−"}${cz(Math.abs(delta))} AU</b> since ${_fmtDay(tMin, { day: "numeric", month: "short" })} · <span class="tag">in</span> +${cz(inSum)} <span class="tag">out</span> ${outSum ? "−" + cz(Math.abs(outSum)) : "0"}`;
 
   // hover — optional extra: a boxed readout for any day (all key values are already printed)
   const hov = svg.querySelector(".hov"), hl = hov.querySelector("line"), hr = hov.querySelector("rect"),

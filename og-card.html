@@ -17,12 +17,14 @@
 <head>
 <meta charset="utf-8">
 <style>
+  @font-face{font-family:"Paper Mono"; src:url("fonts/PaperMono-Variable.woff2") format("woff2"); font-weight:100 800; font-display:block}
+  @font-face{font-family:"Kode Mono"; src:url("fonts/KodeMono-Regular.woff2") format("woff2"); font-weight:400; font-display:block}
   *{box-sizing:border-box}
   html,body{margin:0}
   body{
     width:1200px; height:630px; background:#fff;
     color:oklch(0.148 0.004 228.8);
-    font:13.5px/1.5 ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+    font:13.5px/1.5 "Paper Mono";
     -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
     position:relative;
   }
@@ -31,8 +33,9 @@
   .dot{width:34px; height:34px; border-radius:50%; background:oklch(0.723 0.219 149.579)}
   .brand h1{margin:0; font-size:31px; font-weight:700; letter-spacing:.20em}
   .label{margin-top:38px; font-size:20px; letter-spacing:.06em; color:oklch(0.56 0.021 213.5)}
-  .now{margin-top:8px; font-size:92px; font-weight:700; letter-spacing:-.03em; line-height:1;
+  .now{margin-top:8px; font-size:92px; font-weight:400; letter-spacing:-.01em; line-height:1;
        font-variant-numeric:tabular-nums; font-feature-settings:"tnum"; display:flex; align-items:baseline}
+  .now .fig{font-family:"Kode Mono"}
   .now .dec{color:oklch(0.72 0.014 214.4)}
   .now .cur{font-size:27px; font-weight:500; letter-spacing:0; margin-left:22px;
             color:oklch(0.56 0.021 213.5)}
@@ -45,10 +48,10 @@
   <div class="card">
     <div class="brand"><span class="dot"></span><h1>AETHER</h1></div>
     <div class="label">core charge</div>
-    <div class="now"><span id="int">—</span><span class="dec" id="dec"></span><span class="cur">AU</span></div>
+    <div class="now"><span class="fig" id="int">—</span><span class="fig dec" id="dec"></span><span class="cur">AU</span></div>
     <div class="sub">reserve · read-only node</div>
   </div>
-  <div class="foot">resync ⟢ each cycle</div>
+  <div class="foot">resync → each cycle</div>
 
 <script src="data.js"></script>
 <script>

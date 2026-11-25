@@ -35,8 +35,8 @@ function vitalsItems() {
 }
 function vitalsGrid(items, cols) {
   return `<div class="vgrid c${cols}">` + items.map(it =>
-    `<div class="vcell"><div class="vlab"><span class="mk">≡</span>${it.k}</div>`
-    + `<div class="vval tnum">${it.v}<span class="u">${it.u}</span></div></div>`).join("") + `</div>`;
+    `<div class="vcell"><div class="vlab"><span class="mk" aria-hidden="true"></span>${it.k}</div>`
+    + `<div class="vval tnum"><span class="fig">${it.v}</span><span class="u">${it.u}</span></div></div>`).join("") + `</div>`;
 }
 
 // ---- concentric rings gauge: two hairline circles, radius ∝ amount (linear) ----
@@ -94,12 +94,13 @@ function receiptHTML(head, rows, totals) {
 }
 const signed = n => (n >= 0 ? "+" : "−") + cz2(Math.abs(n));
 function fluxReceipt(list, withTotals) {
-  const rows = list.map(f => [f.date, f.amount >= 0 ? "influx" : "efflux", signed(f.amount)]);
+  const rows = list.map(f => [f.date, f.amount >= 0 ? '<span class="tag w">in</span>influx' : '<span class="tag w">out</span>efflux', signed(f.amount)]);
   let totals = null;
   if (withTotals) {
     const inn = list.filter(f => f.amount > 0).reduce((s, f) => s + f.amount, 0);
     const out = list.filter(f => f.amount < 0).reduce((s, f) => s + f.amount, 0);
-    totals = [["in", signed(inn) + " AU"], ["out", signed(out) + " AU"], ["net", signed(inn + out) + " AU", "net"]];
+    const tg = s => '<span class="tag w">' + s + '</span>';
+    totals = [[tg("in"), signed(inn) + " AU"], [tg("out"), signed(out) + " AU"], [tg("net"), signed(inn + out) + " AU", "net"]];
   }
   return receiptHTML(["date", "movement", "amount AU"], rows, totals);
 }
@@ -127,28 +128,30 @@ function plateHTML(Wpx) {
     if (above) {
       const lx = Math.min(W - 24, Math.max(24, p.x)), ly = p.y - p.r - 6;
       return `<a href="burn.html#${p.t.slug}">${circ}`
-        + `<text x="${lx.toFixed(1)}" y="${(ly - 11).toFixed(1)}" text-anchor="middle">${p.t.no}</text>`
+        + `<rect class="tg" x="${(lx - 9).toFixed(1)}" y="${(ly - 24.5).toFixed(1)}" width="18" height="12"/>`
+        + `<text x="${lx.toFixed(1)}" y="${(ly - 15).toFixed(1)}" text-anchor="middle" style="font-size:9.5px">${p.t.no}</text>`
         + `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" text-anchor="middle">${cz(p.t.total ?? 0)}</text></a>`;
     }
     const ex = p.x + p.r * 0.72, lx = ex + 6, ly = p.y - p.r * 0.72 - 6;
     return `<a href="burn.html#${p.t.slug}">${circ}`
       + `<line class="ln" x1="${ex.toFixed(1)}" y1="${(p.y - p.r * 0.72).toFixed(1)}" x2="${(lx - 2).toFixed(1)}" y2="${(ly + 2).toFixed(1)}"/>`
-      + `<text x="${lx.toFixed(1)}" y="${(ly - 11).toFixed(1)}">${p.t.no}</text>`
+      + `<rect class="tg" x="${(lx - 0.5).toFixed(1)}" y="${(ly - 24.5).toFixed(1)}" width="18" height="12"/>`
+      + `<text x="${(lx + 8.5).toFixed(1)}" y="${(ly - 15).toFixed(1)}" text-anchor="middle" style="font-size:9.5px">${p.t.no}</text>`
       + `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}">${cz(p.t.total ?? 0)}</text></a>`;
   }).join("");
   const cross = `<path class="ln" d="M4,${H - 10} h12 M10,${H - 16} v12"/>`
-    + `<text x="24" y="${H - 6}" style="font-size:9.5px">↑ AU / unit·day · → chronological · area ∝ total</text>`;
+    + `<text x="24" y="${H - 6}" style="font-size:9.5px">↑ AU / unit·day · → chronological · area by total</text>`;
   const svg = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="discharge log diagram"><path class="ln" d="${path}"/>${nodes}${cross}</svg>`;
   const mini = r => { const s = Math.max(2.5, r * 0.15); return `<svg width="${(2 * s + 2).toFixed(0)}" height="${(2 * s + 2).toFixed(0)}" viewBox="0 0 ${(2 * s + 2).toFixed(1)} ${(2 * s + 2).toFixed(1)}"><circle class="c" cx="${(s + 1).toFixed(1)}" cy="${(s + 1).toFixed(1)}" r="${s.toFixed(1)}"/></svg>`; };
-  const rows = pts.map(p => `<tr><td class="no l">${p.t.no}</td><td class="ci">${mini(p.r)}</td>`
-    + `<td class="l"><a href="burn.html#${p.t.slug}">${_esc(p.t.name)}${p.t.pending ? " ·pend" : ""}</a></td>`
+  const rows = pts.map(p => `<tr><td class="no l"><span class="tag">${p.t.no}</span></td><td class="ci">${mini(p.r)}</td>`
+    + `<td class="l"><a href="burn.html#${p.t.slug}">${_esc(p.t.name)}${p.t.pending ? ' <span class="tag">pending</span>' : ""}</a></td>`
     + `<td class="l opt">${_esc(p.t.dates.replace(/ 20\d\d$/, ""))}</td>`
     + `<td>${cz2(p.t.total ?? 0)}</td><td>${perUnitDay(p.t) == null ? "—" : cz2(perUnitDay(p.t))}</td></tr>`).join("");
   const sum = totalDischarged();
   const table = `<table class="pt"><thead><tr><th class="l">no</th><th></th><th class="l">burn</th><th class="l opt">dates</th><th>total AU</th><th>AU/unit·day</th></tr></thead>
-    <tbody>${rows}<tr class="sum"><td class="l" colspan="2">Σ</td><td class="l">${trips.length} burns</td><td class="opt"></td><td>${cz2(sum)}</td><td></td></tr></tbody></table>`;
+    <tbody>${rows}<tr class="sum"><td class="l" colspan="2">∑</td><td class="l">${trips.length} burns</td><td class="opt"></td><td>${cz2(sum)}</td><td></td></tr></tbody></table>`;
   return `<div class="plate"><div class="plate-head"><span>discharge log</span><span>${trips.length} burns · ${cz2(sum)} AU</span></div>
-    <div class="plate-body">${svg}<div>${table}<div class="plate-foot">select a burn ⟢ polar profile</div></div></div></div>`;
+    <div class="plate-body">${svg}<div>${table}<div class="plate-foot">select a burn → polar profile</div></div></div></div>`;
 }
 
 // ---- burn: one tall panel per trip, polar (radar) plot in hairlines ----
@@ -189,16 +192,16 @@ function polarPanelsHTML(selected) {
     const sel = selected && selected === t.slug;
     return `<a class="panel ${fields[k % fields.length]}${sel ? " sel" : ""}" id="${t.slug}" href="#${t.slug}">
       <div>
-        <div>${t.no} / ${String(trips.length).padStart(2, "0")} · burn</div>
-        <div style="font-weight:600">${_esc(t.name)}${t.pending ? " · pending" : ""}</div>
+        <div><span class="tag">${t.no}</span>/ ${String(trips.length).padStart(2, "0")} · burn</div>
+        <div style="font-weight:600">${_esc(t.name)}${t.pending ? ' <span class="tag">pending</span>' : ""}</div>
         <div>${_esc(t.dates)}</div>
       </div>
       <div class="mid">
-        <div class="row2"><span>Σ ${cz2(t.total ?? 0)} AU</span><span>${t.days ? t.days + " d" : ""}</span></div>
+        <div class="row2 tot"><span><span class="s">∑</span><span class="fig">${cz2(t.total ?? 0)}</span><span class="u">AU</span></span><span>${t.days ? t.days + " d" : ""}</span></div>
         <svg viewBox="0 0 ${S} ${S}" role="img" aria-label="${_esc(t.name)} by category">${rings}${spokes}${poly}${vx}</svg>
         <div class="row2"><span>${pd == null ? "" : cz2(pd) + " / unit·day"}</span><span>${(t.items || []).length} items</span></div>
       </div>
-      <div class="row2"><span>polar · r ∝ √AU</span><span class="selmark">◉ selected</span></div>
+      <div class="row2"><span>polar · √AU radius</span><span class="selmark"><span class="tag">selected</span></span></div>
     </a>`;
   }).join("") + `</div>`;
 }

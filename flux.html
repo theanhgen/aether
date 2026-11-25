@@ -38,7 +38,7 @@
   <section class="gp-wrap" id="fchart"></section>
 
   <section>
-    <h2><span class="mk">≡</span>all movements</h2>
+    <h2><span class="mk" aria-hidden="true"></span>all movements</h2>
     <div class="rc-layout">
       <div class="rc-meta">
         <div class="rc-kv" id="meta"></div>
@@ -48,16 +48,16 @@
     </div>
   </section>
 
-  <a class="navlink" href="manifest.html" style="margin-top:20px">⟢ manifest</a>
+  <a class="navlink" href="manifest.html" style="margin-top:20px">← manifest</a>
 
-  <footer>AETHER · read-only node · resync ⟢ each cycle</footer>
+  <footer>AETHER · read-only node · resync → each cycle</footer>
 </div>
 
 <script src="data.js"></script>
 <script src="ui.js"></script>
 <script src="chart.js"></script>
 <script>
-document.getElementById("updated").textContent = "sync ⟢ " + shortDate;
+document.getElementById("updated").innerHTML = '<span class="tag">sync</span>' + shortDate;
 document.getElementById("flux").innerHTML = fluxReceipt(FLUX, true);
 const first = FLUX[FLUX.length - 1], last = FLUX[0];
 document.getElementById("meta").innerHTML = [

@@ -34,16 +34,28 @@
     --grid-minor:oklch(1 0 0 / 8%);
   }
 }
+/* type: two faces, self-hosted (OFL-1.1, licences in fonts/). Paper Mono = all text; Kode Mono = large figures only. */
+@font-face{font-family:"Paper Mono"; src:url("fonts/PaperMono-Variable.woff2") format("woff2"); font-weight:100 800; font-style:normal; font-display:block}
+@font-face{font-family:"Kode Mono"; src:url("fonts/KodeMono-Regular.woff2") format("woff2"); font-weight:400; font-style:normal; font-display:block}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{
-  font:13.5px/1.5 ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,"Liberation Mono",monospace;
+  font:13.5px/1.5 "Paper Mono";
   background:var(--background); color:var(--foreground);
   -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; padding:32px 24px 72px;
 }
 .wrap{max-width:980px; margin:0 auto}
 .wrap.wide{max-width:1200px}
 .tnum{font-variant-numeric:tabular-nums; font-feature-settings:"tnum"}
+/* figure face — large figures only (core charge, vitals, balance, burn totals, chart status) */
+.fig{font-family:"Kode Mono"; font-weight:400; font-variant-numeric:tabular-nums}
+/* REF / LOT tags — small square hairline boxes, text mono, uppercase */
+.tag{display:inline-block; border:1px solid currentColor; border-radius:0; padding:0 .5em; font-size:10px; line-height:13px; letter-spacing:.08em; text-transform:uppercase; font-weight:400; vertical-align:1px; white-space:nowrap}
+.tag.w{min-width:4.2em; text-align:center}
+/* ≡ drawn in CSS (Paper Mono has no U+2261) */
+.mk{display:inline-block; width:.62em; height:.5em; margin-right:.55em; vertical-align:.12em; background:linear-gradient(currentColor,currentColor) 0 0/100% 1px no-repeat, linear-gradient(currentColor,currentColor) 0 50%/100% 1px no-repeat, linear-gradient(currentColor,currentColor) 0 100%/100% 1px no-repeat}
+/* ■ drawn in CSS */
+.sq{display:inline-block; width:.5em; height:.5em; background:currentColor; vertical-align:.05em}
 
 /* focus layout — index: one composed unit, vertically centred */
 body.focus{display:flex; min-height:100dvh; align-items:center; justify-content:center; padding:24px}
@@ -55,13 +67,15 @@ header{display:flex; align-items:flex-end; justify-content:space-between; gap:12
 .brand h1{display:inline-flex; align-items:center; gap:8px; font-size:14px; font-weight:600; letter-spacing:.14em; margin:0}
 .brand .sub{font-size:12px; color:var(--muted-foreground); letter-spacing:.08em}
 .updated{font-size:12px; color:var(--muted-foreground); font-variant-numeric:tabular-nums}
+.updated .tag{margin-right:.5em}
 
 .navlink{display:inline-flex; align-items:center; gap:6px; font-size:12.5px; color:var(--muted-foreground); text-decoration:none; letter-spacing:.02em; padding:9px 6px; margin:2px -6px 0; transition-property:color, scale; transition-duration:.14s; transition-timing-function:ease}
 .navlink:hover{color:var(--primary)}
 .navlink:active{scale:.96}
 
 h2{font-size:12px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--muted-foreground); margin:0 0 10px}
-h2 .mk, .vlab .mk{font-weight:400; margin-right:.55em; color:var(--foreground)}
+h2 .mk, .vlab .mk, .chart-title .mk{font-weight:400; color:var(--foreground)}
+h2 .tag{margin-right:.6em; color:var(--foreground)}
 section + section{margin-top:44px}
 footer{margin-top:36px; text-align:center; font-size:12px; color:var(--muted-foreground); letter-spacing:.04em}
 
@@ -69,6 +83,7 @@ footer{margin-top:36px; text-align:center; font-size:12px; color:var(--muted-for
 .core{display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:56px; align-items:center; border-top:1px solid var(--rule-strong); padding-top:28px}
 .core-l .vlab{margin-bottom:10px}
 .now{font-size:64px; font-weight:400; letter-spacing:-.035em; line-height:1; white-space:nowrap}
+.now .fig{letter-spacing:-.01em}
 .now .cur{font-size:.3em; color:var(--muted-foreground); letter-spacing:0; margin-left:.4em; vertical-align:top; position:relative; top:.25em}
 .accrued{margin:12px 0 30px; font-size:12.5px; color:var(--chart-2); font-variant-numeric:tabular-nums; letter-spacing:.02em}
 .rings{margin:0}
@@ -84,15 +99,16 @@ footer{margin-top:36px; text-align:center; font-size:12px; color:var(--muted-for
 .vcell{border-top:1px solid var(--rule); padding:13px 14px 16px 0; min-width:0}
 .vgrid.c2 .vcell:nth-child(2n), .vgrid.c4 .vcell:not(:nth-child(4n+1)){border-left:1px solid var(--rule); padding-left:16px}
 .vlab{font-size:12.5px; color:var(--muted-foreground); letter-spacing:.03em; white-space:nowrap}
-.vval{font-size:30px; line-height:1.1; margin-top:8px; letter-spacing:-.02em; white-space:nowrap; font-variant-numeric:tabular-nums}
+.vval{font-size:30px; line-height:1.1; margin-top:8px; letter-spacing:0; white-space:nowrap; font-variant-numeric:tabular-nums}
 .vval .u{font-size:12px; letter-spacing:.02em; color:var(--muted-foreground); margin-left:.45em; vertical-align:top; position:relative; top:.15em}
 
 /* ---------- graph-paper balance trace ---------- */
 .gp-head{display:flex; justify-content:space-between; align-items:flex-end; gap:14px; flex-wrap:wrap; padding:0 0 10px; border-bottom:1px solid var(--rule-strong); margin-bottom:12px}
 .chart-title{font-size:12px; font-weight:600; letter-spacing:.12em; text-transform:uppercase; color:var(--muted-foreground)}
 .chart-desc{font-size:11.5px; letter-spacing:.02em; color:var(--muted-foreground); margin-top:3px}
-.chart-cur{font-size:18px; color:var(--foreground); font-variant-numeric:tabular-nums}
+.chart-cur{font-size:19px; color:var(--foreground); font-variant-numeric:tabular-nums}
 .chart-cur span{font-size:11px; color:var(--muted-foreground); margin-left:4px}
+.chart-cur span.fig{font-size:inherit; color:inherit; margin-left:0}
 .gp-body{position:relative; cursor:crosshair}
 svg.gp{display:block; width:100%; height:auto; touch-action:none; font-family:inherit}
 svg.gp text{font-family:inherit; fill:var(--ink); font-size:10px; font-variant-numeric:tabular-nums}
@@ -109,7 +125,9 @@ svg.gp .lead{stroke:var(--ink); stroke-width:.8}
 svg.gp .mk-read{fill:var(--paper); stroke:var(--ink); stroke-width:1.2}
 svg.gp .mk-out{fill:var(--ink)}
 svg.gp .mk-in{stroke:var(--ink); stroke-width:1.2}
-svg.gp .big{font-size:22px; letter-spacing:.02em}
+svg.gp .big{font-size:22px; letter-spacing:.02em; font-family:"Kode Mono"}
+svg.gp .tg{fill:none; stroke:var(--ink); stroke-width:1}
+svg.gp text.tgt{font-size:8px; letter-spacing:.06em}
 svg.gp .ttl{font-size:12px; font-weight:600; letter-spacing:.06em}
 svg.gp .hov line{stroke:var(--ink); stroke-width:.75; stroke-dasharray:2 3}
 .gp-key{display:flex; flex-wrap:wrap; gap:2px 16px; font-size:11px; color:var(--muted-foreground); font-variant-numeric:tabular-nums}
@@ -138,9 +156,11 @@ table.receipt td{padding:6px 0; border-bottom:1px solid var(--rule); vertical-al
 table.receipt .num{text-align:right; font-variant-numeric:tabular-nums; font-feature-settings:"tnum"}
 table.receipt .d{width:9.5em; color:var(--muted-foreground)}
 table.receipt .m{padding-left:12px}
+table.receipt .m .tag{margin-right:.6em}
 .rc-totals{margin-left:auto; width:min(100%, 420px); margin-top:22px; border-top:1px solid var(--rule-strong)}
 .rc-totals div{display:flex; justify-content:space-between; gap:12px; padding:7px 0; border-bottom:1px solid var(--rule); font-size:13px; font-variant-numeric:tabular-nums}
 .rc-totals span:first-child{text-transform:uppercase; letter-spacing:.08em; font-size:11.5px; color:var(--muted-foreground); align-self:center}
+.rc-totals .tag{font-size:10px}
 .rc-totals .net{font-weight:600; border-bottom:1px solid var(--rule-strong)}
 .rc-totals .net span:first-child{color:var(--foreground)}
 
@@ -154,6 +174,8 @@ table.receipt .m{padding-left:12px}
 .plate svg .ln{stroke:#fff; stroke-width:1; fill:none}
 .plate svg .c{stroke:#fff; stroke-width:1; fill:var(--plate)}
 .plate svg a:hover .c{stroke-width:2}
+.plate svg .tg{fill:none; stroke:#fff; stroke-width:1}
+.plate .tag{font-size:9.5px; line-height:12px; padding:0 .4em}
 table.pt{width:100%; border-collapse:collapse; font-size:11.5px; font-variant-numeric:tabular-nums}
 table.pt td,table.pt th{padding:5px 0; white-space:nowrap}
 table.pt th{font-weight:400; text-align:right; font-size:10.5px; letter-spacing:.06em; text-transform:uppercase; opacity:.8; padding-bottom:9px}
@@ -174,6 +196,12 @@ table.pt a:hover{text-decoration:underline}
 .panel.f-white{background:var(--field-white); color:#0a0a0a}
 .panel .row2{display:flex; justify-content:space-between; gap:8px; font-variant-numeric:tabular-nums}
 .panel .row2 > :last-child{text-align:right}
+.panel .row2.tot{align-items:baseline}
+.panel .tot .fig{font-size:21px; letter-spacing:0; text-transform:none}
+.panel .tot .s{margin-right:.35em}
+.panel .tot .u{margin-left:.35em}
+.panel .tag{font-size:9.5px; line-height:12px; padding:0 .45em; margin-right:.5em}
+.panel .selmark .tag{margin-right:0}
 .panel svg{display:block; width:100%; height:auto; overflow:visible}
 .panel svg text{fill:currentColor; font-family:inherit; font-size:9px; letter-spacing:.04em}
 .panel svg .ring{fill:none; stroke:currentColor; stroke-width:.8; opacity:.55}

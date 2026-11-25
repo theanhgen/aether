@@ -32,20 +32,20 @@
   </header>
 
   <section>
-    <h2><span class="mk">≡</span>burn profiles · thrust / berth / galley / survey / aux</h2>
+    <h2><span class="mk" aria-hidden="true"></span>burn profiles · thrust / berth / galley / survey / aux</h2>
     <div id="panels"></div>
   </section>
 
   <section class="burn-items" id="items"></section>
 
-  <a class="navlink" href="manifest.html" style="margin-top:20px">⟢ manifest</a>
-  <footer>AETHER · read-only node · resync ⟢ each cycle</footer>
+  <a class="navlink" href="manifest.html" style="margin-top:20px">← manifest</a>
+  <footer>AETHER · read-only node · resync → each cycle</footer>
 </div>
 
 <script src="data.js"></script>
 <script src="ui.js"></script>
 <script>
-document.getElementById("updated").textContent = "sync ⟢ " + shortDate;
+document.getElementById("updated").innerHTML = '<span class="tag">sync</span>' + shortDate;
 
 function render(scroll) {
   const id = decodeURIComponent(location.hash.slice(1)).toLowerCase();
@@ -57,13 +57,13 @@ function render(scroll) {
   const box = document.getElementById("items");
   if (!trip) {
     box.innerHTML = id
-      ? '<h2><span class="mk">≡</span>not found</h2><div class="chart-desc">no burn called “' + _esc(id) + '” — pick a panel</div>'
-      : '<div class="chart-desc">select a panel ⟢ its discharges</div>';
+      ? '<h2><span class="mk" aria-hidden="true"></span>not found</h2><div class="chart-desc">no burn called “' + _esc(id) + '” — pick a panel</div>'
+      : '<div class="chart-desc">select a panel → its discharges</div>';
     return;
   }
   const items = (trip.items || []).slice().sort((a, b) => parseDay(a.date) - parseDay(b.date));
   const pd = perUnitDay(trip);
-  box.innerHTML = '<h2><span class="mk">≡</span>' + _esc(trip.no + " · " + trip.name) + ' · discharges</h2>'
+  box.innerHTML = '<h2><span class="mk" aria-hidden="true"></span><span class="tag">' + trip.no + '</span>' + _esc(trip.name) + ' · discharges</h2>'
     + receiptHTML(["date", "bucket", "amount AU"],
         items.map(it => [it.date, it.category || "aux", "−" + cz2(it.amount)]),
         [["total discharged", "−" + cz2(trip.total ?? 0) + " AU", "net"],

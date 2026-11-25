@@ -33,11 +33,11 @@
 
   <main class="core">
     <section class="core-l">
-      <div class="vlab"><span class="mk">≡</span>core charge</div>
-      <div class="now tnum"><span id="now">—</span><span class="cur">AU</span></div>
+      <div class="vlab"><span class="mk" aria-hidden="true"></span>core charge</div>
+      <div class="now tnum"><span class="fig" id="now">—</span><span class="cur">AU</span></div>
       <div class="accrued" id="accrued"></div>
       <div id="vitals"></div>
-      <a class="navlink" href="manifest.html" style="margin-top:14px">manifest ⟢</a>
+      <a class="navlink" href="manifest.html" style="margin-top:14px">manifest →</a>
     </section>
     <figure class="rings" id="rings"></figure>
   </main>
@@ -46,7 +46,7 @@
 <script src="data.js"></script>
 <script src="ui.js"></script>
 <script>
-document.getElementById("updated").textContent = "sync ⟢ " + shortDate;
+document.getElementById("updated").innerHTML = '<span class="tag">sync</span>' + shortDate;
 document.getElementById("vitals").innerHTML = vitalsGrid(vitalsItems(), 2);
 
 // rings gauge — outer: total discharged to date (Σ LOG), inner: core charge (live).
@@ -57,7 +57,7 @@ function drawRings() {
     { label: "discharged to date", amount: totalDischarged() },
     { label: "core charge", amount: liveNow() },
     rings.clientWidth
-  ) + '<figcaption>radius ∝ amount · ' + LOG.length + ' burns</figcaption>';
+  ) + '<figcaption>radius by amount · ' + LOG.length + ' burns</figcaption>';
 }
 drawRings();
 let ringsW = rings.clientWidth;

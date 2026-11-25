@@ -36,26 +36,26 @@
   <section class="gp-wrap" id="balchart"></section>
 
   <section>
-    <h2><span class="mk">≡</span>flux · latest</h2>
+    <h2><span class="mk" aria-hidden="true"></span>flux · latest</h2>
     <div id="flux"></div>
-    <a class="navlink" href="flux.html" style="margin-top:8px">all flux ⟢</a>
+    <a class="navlink" href="flux.html" style="margin-top:8px">all flux →</a>
   </section>
 
   <section>
-    <h2><span class="mk">≡</span>discharge log</h2>
+    <h2><span class="mk" aria-hidden="true"></span>discharge log</h2>
     <div id="log"></div>
   </section>
 
-  <a class="navlink" href="index.html" style="margin-top:20px">⟢ core charge</a>
+  <a class="navlink" href="index.html" style="margin-top:20px">← core charge</a>
 
-  <footer>AETHER · read-only node · resync ⟢ each cycle</footer>
+  <footer>AETHER · read-only node · resync → each cycle</footer>
 </div>
 
 <script src="data.js"></script>
 <script src="ui.js"></script>
 <script src="chart.js"></script>
 <script>
-document.getElementById("updated").textContent = "sync ⟢ " + shortDate;
+document.getElementById("updated").innerHTML = '<span class="tag">sync</span>' + shortDate;
 
 // vitals — same grid as the core page, derived from data.js
 document.getElementById("kpis").innerHTML = vitalsGrid(vitalsItems(), 4);
