@@ -57,11 +57,11 @@ const FLUX = [
   { date: "16 Jul 2026", amount: -39682.21 },  // Antares — flight charged
   { date: "15 Jul 2026", amount:  4000 },      // extra influx (2 × 2 000)
   { date: "12 Jul 2026", amount: -8181.83 },   // Altair — Sun on-ground
-  { date: "12 Jul 2026", amount:  -594.11 },   // Altair — Prague Uber
+  { date: "12 Jul 2026", amount:  -594.11 },   // Altair — ground transfer
   { date: "11 Jul 2026", amount:  2000 },
   { date: "11 Jul 2026", amount: -4771.72 },   // Altair — Sat on-ground
   { date: "03 Jul 2026", amount:  2000 },
-  { date: "03 Jul 2026", amount: -1570.57 },   // Altair — Airbnb Sat night
+  { date: "03 Jul 2026", amount: -1570.57 },   // Altair — lodging, Sat night
   { date: "02 Jul 2026", amount: -2776.12 },   // Altair — flight
   { date: "26 Jun 2026", amount:  2000 },
   { date: "20 Jun 2026", amount:  2000 },
